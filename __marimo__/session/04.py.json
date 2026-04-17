@@ -1,0 +1,1434 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.21.1",
+    "script_metadata_hash": "baebd26c5272ae178bbe99e70ecdb93d"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "5d1879833e3d8338a7dad81b19a077d7",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "cd32a369634dd8edccb8999ec7d182f2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a href=\"https://colab.research.google.com/github/mateofra/CUANTICA/blob/main/04.%20Algoritmos%20cu%C3%A1nticos%20de%20optimizaci%C3%B3n.ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "d103f4bad1f2e7c2d43050c0ea522464",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "ca60e976911e34048fb71eaebd977ad0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"algoritmos-cuanticos-de-optimizacion\"><strong>Algoritmos cu\u00e1nticos de optimizaci\u00f3n</strong></h1>\n<h3 id=\"contenidos\">Contenidos</h3>\n<ol>\n<li><a href=\"#intro\">Introducci\u00f3n a los problemas de optimizaci\u00f3n</a></li>\n<li><a href=\"#qubo\">Problemas de optimizaci\u00f3n binaria cuadr\u00e1tica sin restricciones (QUBO) y modelo Ising</a></li>\n<li><a href=\"#restricciones\">Problemas de optimizaci\u00f3n binaria con restricciones</a></li>\n<li><a href=\"#adiabatica\">Computaci\u00f3n cu\u00e1ntica adiab\u00e1tica y Quantum Annealing</a></li>\n<li><a href=\"#variacionales\">Algoritmos variacionales y circuitos parametrizados</a></li>\n<li><a href=\"#qaoa\">Algoritmo cu\u00e1ntico de optimizaci\u00f3n aproximada (QAOA)</a></li>\n<li><a href=\"#otros\">Otros algoritmos cu\u00e1nticos de optimizaci\u00f3n</a></li>\n</ol>\n<span class=\"paragraph\">Ejercicios</span>\n<ol>\n<li><a href=\"#e6\">Ejercicio entregable 6: suma de subconjuntos</a></li>\n<li><a href=\"#e7\">Ejercicio entregable 7: reparto de turnos de trabajo</a></li>\n<li><a href=\"#e8\">Ejercicio entregable 8: suma de subconjuntos con QAOA</a></li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "918b6a526f1273d15d9b54918b6dfa05",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"intro\"></a></span>\n<h1 id=\"introduccion-a-los-problemas-de-optimizacion\"><strong>Introducci\u00f3n a los problemas de optimizaci\u00f3n</strong></h1>\n<span class=\"paragraph\">Muchos problemas relevantes en ciencia, ingenier\u00eda, econom\u00eda o inteligencia artificial pueden expresarse como <strong>problemas de optimizaci\u00f3n</strong>. En t\u00e9rminos generales, un problema de optimizaci\u00f3n consiste en encontrar los valores de ciertas variables que <strong>minimizan</strong> o <strong>maximizan</strong> una <strong>funci\u00f3n objetivo</strong>, respetando una serie de <strong>restricciones</strong>.</span>\n<span class=\"paragraph\">Formalmente, un problema de optimizaci\u00f3n puede escribirse como:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{aligned}\n\\text{Minimizar (o maximizar)} \\quad &amp; f(x_1, x_2, \\dots, x_n) \\\\\n\\text{sujeto a} \\quad &amp; g_i(x_1, \\dots, x_n) \\leq 0, \\quad i = 1, \\dots, m \\\\\n&amp; h_j(x_1, \\dots, x_n) = 0, \\quad j = 1, \\dots, p\n\\end{aligned}\n||]</marimo-tex><span class=\"paragraph\">donde:</span>\n<ul>\n<li><marimo-tex class=\"arithmatex\">||(f||)</marimo-tex> es la funci\u00f3n objetivo,</li>\n<li><marimo-tex class=\"arithmatex\">||(g_i||)</marimo-tex> son restricciones de desigualdad,</li>\n<li><marimo-tex class=\"arithmatex\">||(h_j||)</marimo-tex> son restricciones de igualdad,</li>\n<li>y las variables <marimo-tex class=\"arithmatex\">||(x_k||)</marimo-tex> pueden ser reales, enteras, binarias o discretas.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "eec24141d908afdb5d1de4773cc9f5c0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"ejemplos-clasicos-de-problemas-de-optimizacion\">Ejemplos cl\u00e1sicos de problemas de optimizaci\u00f3n</h3>\n<ul>\n<li><strong>Problema del viajante (TSP)</strong>: Dado un conjunto de ciudades y las distancias entre ellas, encontrar el camino m\u00e1s corto que visite cada ciudad exactamente una vez y regrese al punto de origen.</li>\n<li><strong>Problema de la mochila (Knapsack)</strong>: Dados objetos con un peso y un valor, seleccionar un subconjunto cuyo peso total no exceda una capacidad dada y cuyo valor total sea m\u00e1ximo.</li>\n<li><strong>Coloraci\u00f3n de grafos</strong>: Asignar colores a los nodos de un grafo de forma que nodos adyacentes no compartan color y se minimice el n\u00famero total de colores utilizados.</li>\n<li><strong>Problema de satisfacibilidad booleana (SAT)</strong>: Determinar si existe una asignaci\u00f3n de valores booleanos a un conjunto de variables que satisfaga una f\u00f3rmula l\u00f3gica.</li>\n<li><strong>Programaci\u00f3n lineal binaria/entera</strong>: Optimizar una funci\u00f3n lineal sujeta a restricciones lineales, donde las variables s\u00f3lo pueden tomar valores binarios/enteros.</li>\n</ul>\n<span class=\"paragraph\">Muchos de estos problemas son <a href=\"https://es.wikipedia.org/wiki/NP-hard\" rel=\"noopener noreferrer\" target=\"_blank\"><strong>NP-duros</strong></a>, es decir, su complejidad crece exponencialmente con el tama\u00f1o del problema.</span>\n<details>\n<summary>Resumen sobre las clases de complejidad computacional</summary>\n\nCuando hablamos de la **complejidad computacional** de un problema, nos referimos a la cantidad de recursos (tiempo y/o espacio) necesarios para resolverlo en funci\u00f3n del tama\u00f1o de la entrada. Esto se formaliza mediante **clases de complejidad**, que agrupan problemas seg\u00fan los recursos requeridos por sus algoritmos.\n\n### Clases principales\n\n#### \ud83d\udd39 P (Polynomial Time)\n\n- Conjunto de problemas que pueden resolverse en **tiempo polin\u00f3mico** por una m\u00e1quina determinista.\n\n- Es decir, existen algoritmos eficientes que resuelven el problema con un coste $O(n^k)$, para alguna constante $k$.\n\n- **Ejemplo**: ordenamiento de una lista, b\u00fasqueda en un grafo no ponderado.\n\n#### \ud83d\udd39 NP (Nondeterministic Polynomial Time)\n\n- Problemas cuya soluci\u00f3n puede **verificarse** en tiempo polin\u00f3mico, aunque no sepamos c\u00f3mo **encontrarla** eficientemente.\n\n- Incluye todos los problemas de P (es decir, $\\text{P} \\subseteq \\text{NP}$).\n\n- **Ejemplo**: SAT, TSP, coloreado de grafos, problema de la mochila.\n\n#### \ud83d\udd39 NP-completo\n\n- Subconjunto de NP que incluye los problemas **m\u00e1s dif\u00edciles** de la clase.\n\n- Un problema es NP-completo si:\n\n    1. Pertenece a NP.\n\n    2. Todo problema en NP puede reducirse a \u00e9l en tiempo polin\u00f3mico.\n\n- Si se resuelve uno en tiempo polin\u00f3mico, **todos los problemas de NP tambi\u00e9n se pueden resolver eficientemente**.\n\n- **Ejemplo**: SAT (el primer problema demostrado como NP-completo), 3-COLOR, TSP en su versi\u00f3n de decisi\u00f3n (determinar si existe un camino menor o igual que un valor dado).\n\n#### \ud83d\udd39 NP-duro (NP-hard)\n\n- Problemas **al menos tan dif\u00edciles** como los NP-completos, pero **no necesariamente pertenecen a NP** (por ejemplo, pueden no tener soluciones verificables en tiempo polin\u00f3mico).\n\n- Suelen ser problemas de optimizaci\u00f3n o de decisi\u00f3n m\u00e1s generales.\n\n- **Ejemplo**: versi\u00f3n de optimizaci\u00f3n del TSP (encontrar el camino m\u00e1s corto), QUBO, etc.\n\n### \u00bfP = NP?\n\nLa pregunta de si $\\text{P} = \\text{NP}$ es uno de los problemas abiertos m\u00e1s importantes de la inform\u00e1tica te\u00f3rica. Si se demuestra que $\\text{P} = \\text{NP}$, todos los problemas cuya soluci\u00f3n se puede verificar eficientemente tambi\u00e9n podr\u00edan **resolverse** eficientemente, lo que tendr\u00eda enormes implicaciones en criptograf\u00eda, planificaci\u00f3n, dise\u00f1o autom\u00e1tico, etc.\n\n---\n\n### Clases de complejidad cu\u00e1ntica\n\n#### \ud83d\udd39 BQP (Bounded-error Quantum Polynomial Time)\n\n- Problemas que pueden resolverse en **tiempo polin\u00f3mico por una computadora cu\u00e1ntica** con un error de probabilidad acotado (< 1/3).\n\n- Es la **contraparte cu\u00e1ntica de P**, e incluye algunos problemas que no se sabe c\u00f3mo resolver eficientemente con algoritmos cl\u00e1sicos.\n\n- **Ejemplo**: factorizaci\u00f3n de enteros (algoritmo de Shor), logaritmo discreto, simulaci\u00f3n de sistemas cu\u00e1nticos.\n\n$$\n\\text{P} \\subseteq \\text{BPP} \\subseteq \\text{BQP}\n$$\n\nDonde **BPP** (Bounded-error Probabilistic Polynomial time) representa problemas que pueden resolverse eficientemente con algoritmos probabil\u00edsticos cl\u00e1sicos.\n\n#### \ud83d\udd39 QMA (Quantum Merlin-Arthur)\n\n- Contraparte cu\u00e1ntica de **NP**: problemas para los que un verificador cu\u00e1ntico puede comprobar una prueba cu\u00e1ntica en tiempo polin\u00f3mico.\n\n- Existen problemas QMA-completos, como ciertas versiones del **problema del Hamiltoniano local**.\n\n---\n\n### Relaciones generales entre clases (parcialmente conocidas)\n\n- Se sabe que:\n\n$$\n\\text{P} \\subseteq \\text{NP}, \\quad \\text{P} \\subseteq \\text{BQP}\n$$\n\n- Pero **no se conoce** si:\n\n$$\n\\text{NP} \\subseteq \\text{BQP} \\quad \\text{o si} \\quad \\text{BQP} \\subseteq \\text{NP}\n$$\n\n---\n\n### Relevancia para la computaci\u00f3n cu\u00e1ntica\n\nProblemas como **QUBO** o el **modelo de Ising** pertenecen a la clase **NP-hard** y, en general, **no se espera** que puedan resolverse eficientemente en computadoras cl\u00e1sicas. Sin embargo, ciertos algoritmos cu\u00e1nticos como el **Quantum Annealing** (usado en D-Wave) o el **QAOA (Quantum Approximate Optimization Algorithm)** ofrecen aproximaciones prometedoras, que caen dentro (o cerca) de la clase BQP o heur\u00edsticas asociadas.\n\n---\n\n</details>\n\n<span class=\"paragraph\">En lo que sigue, nos centraremos en el problema <strong>QUBO</strong>, una formulaci\u00f3n central para representar problemas de optimizaci\u00f3n combinatoria, tanto en su versi\u00f3n cl\u00e1sica como en su versi\u00f3n cu\u00e1ntica.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "9d01d819d709b778b4e8ddccea017108",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"qubo\"></a></span>\n<h1 id=\"problemas-de-optimizacion-binaria-cuadratica-sin-restricciones-qubo-y-modelo-ising\"><strong>Problemas de optimizaci\u00f3n binaria cuadr\u00e1tica sin restricciones (QUBO) y modelo Ising</strong></h1>\n<span class=\"paragraph\">Un tipo de problemas en los que se est\u00e1 usando la computaci\u00f3n cu\u00e1ntica son los denominados <a href=\"https://en.wikipedia.org/wiki/Quadratic_unconstrained_binary_optimization\" rel=\"noopener noreferrer\" target=\"_blank\">QUBO</a> (<em>Quadratic Unconstrained Binary Optimization</em>).</span>\n<span class=\"paragraph\">Este tipo de problemas consisten en minimizar una funci\u00f3n <marimo-tex class=\"arithmatex\">||(f_Q(x)||)</marimo-tex> con la siguiente forma:</span>\n<marimo-tex class=\"arithmatex\">||[\nf_Q(x) = x^TQx = \\sum_{i=0}^{n-1}\\sum_{j=0}^i q_{ij}x_ix_j\n||]</marimo-tex><span class=\"paragraph\">donde <marimo-tex class=\"arithmatex\">||(Q \\in \\mathbb{R}^{n\\times n}||)</marimo-tex> es una matriz triangular y <marimo-tex class=\"arithmatex\">||(x||)</marimo-tex> un vector de componentes binarias (<marimo-tex class=\"arithmatex\">||(x_i \\in \\{0,1\\}||)</marimo-tex>).</span>\n<span class=\"paragraph\">Los problemas QUBO son <a href=\"https://es.wikipedia.org/wiki/NP-hard\" rel=\"noopener noreferrer\" target=\"_blank\">NP-duros</a>.</span>\n<span class=\"paragraph\">Muchos modelos de optimizaci\u00f3n combinatoria pueden expresarse como problemas QUBO, por ejemplo modelos de programaci\u00f3n lineal o problemas como el coloreado de grafos o el problema del viajante.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "9e30dc862d8030e5e497845bb2795f8f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"ejemplo-algoritmo-max-cut\">Ejemplo: algoritmo MAX-CUT</h3>\n<span class=\"paragraph\">Sea <marimo-tex class=\"arithmatex\">||(G = (V, E)||)</marimo-tex> un grafo pesado no dirigido con <marimo-tex class=\"arithmatex\">||(n||)</marimo-tex>-nodos y pesos <marimo-tex class=\"arithmatex\">||(w_{ij}&gt;0||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(w_{ij}=w_{ji}||)</marimo-tex>, con <marimo-tex class=\"arithmatex\">||((i,j)\\in E||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(w_{ij}=0||)</marimo-tex> si <marimo-tex class=\"arithmatex\">||((i,j)\\notin E||)</marimo-tex>.</span>\n<span class=\"paragraph\">Objetivo: dividir el grafo en dos conjuntos tal que la suma de los pesos de las aristas entre ambos conjuntos sea m\u00e1ximo.</span>\n<center><img src=\"https://drive.google.com/uc?export=view&id=1t37PWgnsVWRkX16wcbmFSPZNZ1D0dUOS\" alt=\"Ejemplo MAX-CUT\" width=\"700\"  /></center>\n\n<span class=\"paragraph\">En este grafo, los nodos <marimo-tex class=\"arithmatex\">||(0||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(3||)</marimo-tex> se asignan a un conjunto y <marimo-tex class=\"arithmatex\">||(1||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(2||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(4||)</marimo-tex> al otro. El peso del corte es <marimo-tex class=\"arithmatex\">||(19||)</marimo-tex>.</span>\n<span class=\"paragraph\">El algoritmo procede asignando a cada v\u00e9rtice un valor <marimo-tex class=\"arithmatex\">||(x_i = \\{0,1\\}||)</marimo-tex> de forma que el grafo queda dividido en dos conjuntos: los v\u00e9rtices con <marimo-tex class=\"arithmatex\">||(x_i = 0||)</marimo-tex> y aquellos con <marimo-tex class=\"arithmatex\">||(x_i = 1||)</marimo-tex>.</span>\n<span class=\"paragraph\">El algoritmo MAX-CUT busca el n\u00famero binario <marimo-tex class=\"arithmatex\">||(\\textbf{x}=x_0\\cdots x_{n-1}||)</marimo-tex> que maximice la funci\u00f3n de coste:</span>\n<marimo-tex class=\"arithmatex\">||[\nC(\\textbf{x}) = \\sum_{i,j = 0}^{n-1} w_{ij} x_i (1-x_j)\n||]</marimo-tex><span class=\"paragraph\">siendo <marimo-tex class=\"arithmatex\">||(w_{i,j} \\ne 0||)</marimo-tex> solo si <marimo-tex class=\"arithmatex\">||((i,j) \\in E||)</marimo-tex>.</span>\n<span class=\"paragraph\">Si los v\u00e9rtices <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(j||)</marimo-tex> est\u00e1n en el mismo conjunto: <marimo-tex class=\"arithmatex\">||(x_i = x_j \\Rightarrow x_i (1-x_j) = 0||)</marimo-tex>.</span>\n<span class=\"paragraph\">Si los v\u00e9rtices <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(j||)</marimo-tex> est\u00e1n en diferentes conjunto: <marimo-tex class=\"arithmatex\">||(x_i \\ne x_j \\Rightarrow x_i (1-x_j) = 1||)</marimo-tex> \u00f3 <marimo-tex class=\"arithmatex\">||(x_j (1-x_i) = 1||)</marimo-tex>.</span>\n<span class=\"paragraph\">En la soluci\u00f3n del grafo de la imagen podemos tener:</span>\n<marimo-tex class=\"arithmatex\">||[\\begin{align}\nx_0=x_3=0; x_1=x_2=x_4=1 \u2192 01101\\\\\nx_0=x_3=1; x_1=x_2=x_4=0 \u2192 10010\\\\\n\\end{align}||]</marimo-tex><span class=\"paragraph\">y el peso es:</span>\n<marimo-tex class=\"arithmatex\">||[\nC(01101) = w_{01}x_0(1-x_1)+ w_{10}x_1(1-x_0)+w_{12}x_1(1-x_2)+w_{21}x_2(1-x_1)+\\\\\nw_{13}x_1(1-x_3)+w_{31}x_3(1-x_1)+w_{23}x_2(1-x_3)+w_{32}x_3(1-x_2)+\\\\\nw_{24}x_2(1-x_4)+w_{42}x_4(1-x_2)+w_{34}x_3(1-x_4)+w_{43}x_4(1-x_3)=\\\\\nw_{10}+w_{13}+w_{23}+w_{43} = 3+4+7+5 = 19\n||]</marimo-tex><span class=\"paragraph\">As\u00ed, <marimo-tex class=\"arithmatex\">||(C(\\textbf{x})||)</marimo-tex> es la suma de los pesos de las aristas que separan ambos conjuntos.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "572db8b0386b24802b5f65538f8eeed1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"maxcut-como-problema-qubo\">MAXCUT como problema QUBO</h3>\n<span class=\"paragraph\">Los valores <marimo-tex class=\"arithmatex\">||(w_{ij}||)</marimo-tex> son <marimo-tex class=\"arithmatex\">||(\\ne 0||)</marimo-tex> solo para las aristas del grafo.</span>\n<span class=\"paragraph\">Para una arista <marimo-tex class=\"arithmatex\">||((i,j)\\in E||)</marimo-tex>, los t\u00e9rminos en <marimo-tex class=\"arithmatex\">||(C(x)||)</marimo-tex> son:</span>\n<marimo-tex class=\"arithmatex\">||[\nx_i(1-x_j) + x_j(1-x_i) = x_i+x_j-2x_ix_j\n||]</marimo-tex><span class=\"paragraph\">Por tanto, podemos escribir la funci\u00f3n de coste como:</span>\n<marimo-tex class=\"arithmatex\">||[\nC(x) = \\sum_{(i,j) \\in E} w_{ij} (x_i + x_j - 2 x_i x_j) = \\sum_{(i,j) \\in E} w_{ij} (x_i - x_j)^2\n||]</marimo-tex><span class=\"paragraph\">ya que <marimo-tex class=\"arithmatex\">||(x_i^2 = x_i||)</marimo-tex> al ser valores binarios.</span>\n<span class=\"paragraph\">Para expresarlo como un <strong>problema QUBO</strong>, que requiere una <strong>minimizaci\u00f3n</strong>, usamos el negativo:</span>\n<marimo-tex class=\"arithmatex\">||[\nf(x) = -\\sum_{(i,j) \\in E} w_{ij} (x_i + x_j - 2 x_i x_j)\n||]</marimo-tex><span class=\"paragraph\">Es simple deducir que, dado que <marimo-tex class=\"arithmatex\">||(w_{ij}=0, \\forall (i,j)\\notin E||)</marimo-tex>,  podemos escribir:</span>\n<marimo-tex class=\"arithmatex\">||[\nf(x) = -\\sum_{i \\in V} w^{(i)} x_i + \\sum_{\\substack{i,j \\in V \\\\ j \\gt i}} 2 w_{ij} x_i x_j\n||]</marimo-tex><span class=\"paragraph\">siendo <marimo-tex class=\"arithmatex\">||(w^{(i)} = \\sum_{j\\in V}w_{ij}||)</marimo-tex>, es decir, la suma de los pesos de las aristas conectadas al v\u00e9rtice <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "c7c9e859157836f45d3826c875434a84",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"matriz-q-del-qubo\">Matriz <marimo-tex class=\"arithmatex\">||(Q||)</marimo-tex> del QUBO</h4>\n<span class=\"paragraph\">Reorganizamos la expresi\u00f3n en forma cuadr\u00e1tica:</span>\n<marimo-tex class=\"arithmatex\">||[\nf(x) = x^T Q x\n||]</marimo-tex><span class=\"paragraph\">Donde <marimo-tex class=\"arithmatex\">||(Q \\in \\mathbb{R}^{n \\times n}||)</marimo-tex> es una matriz triangular definida como:</span>\n<span class=\"paragraph\">$$\nq_{ij} =\n\\begin{cases}</span>\n<ul>\n<li>w^{(i)} &amp; \\text{si } i = j \\\n2 w_{ij} &amp; \\text{si } (i,j) \\in E \\text{ y } j \\gt i \\\n0 &amp; \\text{si } (i,j) \\notin E\n\\end{cases}\n$$</li>\n</ul>\n<span class=\"paragraph\">es decir, lor t\u00e9rminos lineales aparecen en la diagonal y los cuadr\u00e1ticos fuera de la diagonal.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "90112e6ef7c30d5740e46f126aba1e25",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Ejemplo</strong>: grafo anterior como QUBO</span>\n<span class=\"paragraph\">La funci\u00f3n de coste quedar\u00eda:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{align}\nf(x) &amp; = -\\sum_{(i,j) \\in E} w_{ij} (x_i + x_j - 2 x_i x_j) \\\\\n&amp; = -w_{01} (x_0+x_1-2x_0x_1) - w_{12} (x_1+x_2-2x_1x_2) - w_{13} (x_1+x_3-2x_1x_3) \\\\\n&amp; - w_{23} (x_2+x_3-2x_2x_3) - w_{24} (x_2+x_4-2x_2x_4) - w_{34} (x_3+x_4-2x_3x_4)\n\\end{align}\n||]</marimo-tex><span class=\"paragraph\">Juntando t\u00e9rminos:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{align}\nf(x) &amp; = -w_{01}x_0-(w_{01}+w_{12}+ w_{13})x_1-(w_{12}+w_{23}+w_{24})x_2-(w_{13}+w_{23}+w_{34})x_3-(w_{24}+w_{34})x_4\\\\\n&amp; + 2(w_{01}x_0x_1 + w_{12}x_1x_2 + w_{13}x_1x_3 + w_{23}x_2x_3 + w_{24}x_2x_4 + w_{34}x_3x_4)\n\\end{align}\n||]</marimo-tex><span class=\"paragraph\">Reemplazando los valores de los pesos:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{align}\nf(x) &amp; = -3x_0-(3+2+4)x_1-(2+7+1)x_2-(4+7+5)x_3-(1+5)x_4\\\\\n&amp; + 2(3x_0x_1 + 2x_1x_2 + 4x_1x_3 + 7x_2x_3 + 1x_2x_4 + 5x_3x_4)\\\\\n&amp; = -3x_0- 9x_1-10x_2-16x_3-6x_4\\\\\n&amp; + 6x_0x_1 + 4x_1x_2 + 8x_1x_3 + 14x_2x_3 + 2x_2x_4 + 10x_3x_4\n\\end{align}\n||]</marimo-tex><span class=\"paragraph\">La matriz <marimo-tex class=\"arithmatex\">||(Q||)</marimo-tex> correspondiente es:</span>\n<marimo-tex class=\"arithmatex\">||[\nQ = \\begin{pmatrix}\n-3 &amp;  6 &amp; 0 &amp; 0 &amp; 0 \\\\\n 0 &amp; -9 &amp; 4 &amp; 8 &amp; 0 \\\\\n 0 &amp;  0 &amp; -10  &amp; 14 &amp; 2 \\\\\n 0 &amp;  0 &amp; 0  &amp; -16 &amp; 10 \\\\\n 0 &amp;  0 &amp; 0  &amp; 0 &amp; -6\n\\end{pmatrix}\n||]</marimo-tex><span class=\"paragraph\">Se puede comprobar que:</span>\n<marimo-tex class=\"arithmatex\">||[\nf(01101) = x^T Q x = -19\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "d5f24ee654dfdc47fdd4e197e5d22f70",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "1c5b5e29a92537a6d0720d8d3ba98d6c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"modelo-ising\"><strong>Modelo Ising</strong></h2>\n<span class=\"paragraph\">El <a href=\"https://en.wikipedia.org/wiki/Ising_model\" rel=\"noopener noreferrer\" target=\"_blank\"><em>modelo Ising</em></a> es un modelo matem\u00e1tico usado en f\u00edsica estad\u00edstica para estudiar el comportamiento de materiales ferromagn\u00e9ticos.</span>\n<span class=\"paragraph\">Este modelo parte de una malla de <marimo-tex class=\"arithmatex\">||(n||)</marimo-tex> part\u00edculas y busca minimizar el hamiltoniano:</span>\n<marimo-tex class=\"arithmatex\">||[\nH(\\textbf{z}) = -\\sum_{(i,j) \\in E} J_{ij}z_iz_j -\\sum_j h_j z_j\n||]</marimo-tex><span class=\"paragraph\">donde <marimo-tex class=\"arithmatex\">||(z_i = \\{-1,1\\}||)</marimo-tex> representa el esp\u00edn de la part\u00edcula <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(E||)</marimo-tex> el conjunto de aristas de la malla, <marimo-tex class=\"arithmatex\">||(J_{ij}||)</marimo-tex> la energ\u00eda de interacci\u00f3n entre dos part\u00edculas y <marimo-tex class=\"arithmatex\">||(h_i||)</marimo-tex> la influencia de un campo magn\u00e9tico externo.</span>\n<span class=\"paragraph\">Resolver el problema permite obtener la configuraci\u00f3n de espines correspondiente a un estado de m\u00ednima energ\u00eda (o estado base).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "b40982db49c8aaff59c4b0873eb88103",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Ejemplo</strong>:</span>\n<center><img src=\"https://drive.google.com/uc?export=view&id=1t8ii_V5HKX0sCVPKqgShQQzqTZOcXVxZ\" alt=\"Malla Ising\" width=\"500\"  /></center>\n\n<span class=\"paragraph\">En esta malla, suponiendo que <marimo-tex class=\"arithmatex\">||(h_i=1, \\forall{i}||)</marimo-tex>, el Hamiltoniano resulta:</span>\n<marimo-tex class=\"arithmatex\">||[\nH(\\textbf{z}) = z_0z_1-3z_1z_2+z_2z_3-2z_0z_4+z_1z_5-3z_2z_6-2z_3z_7\\\\\n+z_4z_5+z_5z_6+z_6z_7+z_4z_8-3z_5z_9+z_6z_{10}-z_7z_{11}\\\\\n+z_8z_9-2z_9z_{10}+2z_{10}z_{11}-z_0-z_1-z_2-z_3-z_4-z_5\\\\\n-z_6-z_7-z_8-z_9-z_{10}-z_{11}\n||]</marimo-tex><span class=\"paragraph\">con <marimo-tex class=\"arithmatex\">||(z_i = \\{-1,1\\}, \\forall i||)</marimo-tex></span>\n<span class=\"paragraph\">Es posible demostrar que cualquier problema QUBO puede expresarse como un modelo Ising de forma simple.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "fc71e98a5a86d7ca31b6a94aa5cf5542",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"expresion-mediante-operadores-cuanticos\">Expresi\u00f3n mediante operadores cu\u00e1nticos</h3>\n<span class=\"paragraph\">Supongamos la siguiente malla simple:</span>\n<center><img src=\"https://drive.google.com/uc?export=view&id=1pHIFMBSBWWciVhG1ll_SAKibigkHOiKz\" alt=\"Malla Ising 3 nodos\" width=\"350\"  /></center>\n\n<span class=\"paragraph\">En este caso, suponiendo ahora que <marimo-tex class=\"arithmatex\">||(h_i=0, \\forall{i}||)</marimo-tex>, el problema queda como sigue:</span>\n<marimo-tex class=\"arithmatex\">||[\\begin{align*}\n\\text{Minimizar}\\quad &amp; z_1 z_0 - 3z_2z_1 \\\\\n\\text{con}\\quad &amp; z_i = \\{-1,1\\}, i = 0,1,2\n\\end{align*}||]</marimo-tex><span class=\"paragraph\">Para el operador Pauli-Z, los valores esperados en los estados <marimo-tex class=\"arithmatex\">||(|0\\rangle||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(|1\\rangle||)</marimo-tex> son:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{aligned}\n\\langle 0|Z|0\\rangle &amp;= \\begin{bmatrix}1 &amp; 0\\end{bmatrix}\\begin{bmatrix}1 &amp; 0\\\\0 &amp; -1\\end{bmatrix}\\begin{bmatrix}1 \\\\ 0\\end{bmatrix} = 1\\\\\n\\langle 1|Z|1\\rangle &amp;= \\begin{bmatrix}0 &amp; 1\\end{bmatrix}\\begin{bmatrix}1 &amp; 0\\\\0 &amp; -1\\end{bmatrix}\\begin{bmatrix}0 \\\\ 1\\end{bmatrix} = -1\n\\end{aligned}\n||]</marimo-tex><span class=\"paragraph\">Por lo tanto, podemos expresar el problema anterior como:</span>\n<marimo-tex class=\"arithmatex\">||[\\begin{align*}\n\\text{Minimizar}\\quad &amp; \\langle x_1|Z|x_1\\rangle \\langle x_0|Z|x_0\\rangle - 3 \\langle x_2|Z|x_2\\rangle \\langle x_1|Z|x_1\\rangle\\\\\n\\text{con}\\quad &amp; x_i = \\{0,1\\}, i = 0,1,2\n\\end{align*}||]</marimo-tex><span class=\"paragraph\">Supongamos un estado base de un sistema de 3 c\u00fabits, <marimo-tex class=\"arithmatex\">||(|x\\rangle = |x_2x_1x_0\\rangle||)</marimo-tex> con <marimo-tex class=\"arithmatex\">||(x_i = \\{0,1\\}||)</marimo-tex>.</span>\n<span class=\"paragraph\">Podemos escribir:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x_1|Z|x_1\\rangle \\langle x_0|Z|x_0\\rangle =\n\\langle x_2|I|x_2\\rangle \\langle x_1|Z|x_1\\rangle \\langle x_0|Z|x_0\\rangle =\n\\langle x_2x_1x_0|I\\otimes Z \\otimes Z|x_2x_1x_0\\rangle = \\langle x|Z_1Z_0|x\\rangle\n||]</marimo-tex><span class=\"paragraph\">donde el operador <marimo-tex class=\"arithmatex\">||(Z_i||)</marimo-tex> act\u00faa sobre el c\u00fabit <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>.</span>\n<span class=\"paragraph\">Por lo tanto, el problema anterior se puede expresar como buscar el estado base <marimo-tex class=\"arithmatex\">||(|x_\\text{min}\\rangle||)</marimo-tex> que minimize la siguiente expresi\u00f3n:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x|Z_1Z_0|x\\rangle - 3\\langle x|Z_2Z_1|x\\rangle = \\langle x|Z_1Z_0-3Z_2Z_1|x\\rangle = \\langle x|H|x\\rangle\n||]</marimo-tex><span class=\"paragraph\">siendo H el observable <marimo-tex class=\"arithmatex\">||(H=Z_1Z_0-3Z_2Z_1||)</marimo-tex></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "0a2a28c96ede6153c408a0adf4c66728",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"generalizacion\">Generalizaci\u00f3n</h4>\n<span class=\"paragraph\">Los t\u00e9rminos lineales del modelo Ising se pueden expresar como:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\sum_{j} h_j \\langle x|Z_j|x\\rangle\n||]</marimo-tex><span class=\"paragraph\">Por lo que resolver el problema Ising es equivalente a <strong>encontrar el estado <marimo-tex class=\"arithmatex\">||(|x\\rangle||)</marimo-tex> que minimiza</strong>:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x|H|x\\rangle = -\\sum_{(i,j) \\in E} J_{ij}\\langle x|Z_iZ_j|x\\rangle -\\sum_j h_j \\langle x|Z_j|x\\rangle\n||]</marimo-tex><span class=\"paragraph\">siendo <marimo-tex class=\"arithmatex\">||(H||)</marimo-tex>:</span>\n<marimo-tex class=\"arithmatex\">||[\nH = -\\sum_{(i,j) \\in E} J_{ij}Z_iZ_j -\\sum_j h_j Z_j\n||]</marimo-tex><span class=\"paragraph\">Se puede demostrar que el m\u00ednimo de energ\u00eda siempre se encuentra en uno de los estados base, por lo que podemos buscar el estado <marimo-tex class=\"arithmatex\">||(\\psi||)</marimo-tex> general que minimice:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle \\psi|H|\\psi\\rangle = -\\sum_{(i,j) \\in E} J_{ij}\\langle\\psi|Z_iZ_j|\\psi\\rangle -\\sum_j h_j \\langle\\psi|Z_j|\\psi\\rangle\n||]</marimo-tex><span class=\"paragraph\">y que ser\u00e1 la soluci\u00f3n del problema.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "b78817fb8b9e738cc612a03296dd99b0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"obtencion-del-valor-esperado\">Obtenci\u00f3n del valor esperado</h3>\n<span class=\"paragraph\">Dado un estado gen\u00e9rico  <marimo-tex class=\"arithmatex\">||(|\\psi\\rangle=\\sum_i a_i|x_i\\rangle||)</marimo-tex>, el valor esperado de un Hamiltoniano <marimo-tex class=\"arithmatex\">||(H||)</marimo-tex> es:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle\\psi|H|\\psi\\rangle = \\left(\\sum_j a^\\star_j\\langle x_j|\\right)|H|\n\\left(\\sum_i a_i|x_i\\rangle\\right) =\n\\sum_j\\sum_i a^\\star_j a_i \\langle x_j|H|x_i\\rangle\n||]</marimo-tex><span class=\"paragraph\">Como en nuestro caso <marimo-tex class=\"arithmatex\">||(H||)</marimo-tex> es un hamiltoniano Ising <marimo-tex class=\"arithmatex\">||(\u21d2||)</marimo-tex> es diagonal, por lo que los elemento de la base son autovectores:</span>\n<marimo-tex class=\"arithmatex\">||[\nH|x_i\\rangle = \\lambda_i |x_i\\rangle\n||]</marimo-tex><span class=\"paragraph\">y tambi\u00e9n:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x_i|H|x_i\\rangle = \\langle x_i|\\lambda_i |x_i\\rangle = \\lambda_i\\langle x_i|x_i\\rangle = \\lambda_i\n||]</marimo-tex><span class=\"paragraph\">Por tanto:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle\\psi|H|\\psi\\rangle = \\sum_j\\sum_i a^\\star_j a_i \\langle x_j|\\lambda_i|x_i\\rangle = \\sum_j\\sum_i a^\\star_j a_i \\lambda_i \\langle x_j|x_i\\rangle =\n\\sum_i |a_i|^2 \\lambda_i = \\sum_i P(x_i) \\langle x_i|H|x_i\\rangle\n||]</marimo-tex><span class=\"paragraph\">donde hemos usado que <marimo-tex class=\"arithmatex\">||(\\langle x_j|x_i\\rangle = 0||)</marimo-tex> si <marimo-tex class=\"arithmatex\">||(x_i\\ne x_j||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(\\langle x_i|x_i\\rangle = 1||)</marimo-tex>.</span>\n<span class=\"paragraph\"><marimo-tex class=\"arithmatex\">||(P(x_i)||)</marimo-tex> es la probabilidad de medir el estado <marimo-tex class=\"arithmatex\">||(|x_i\\rangle||)</marimo-tex>.</span>\n<span class=\"paragraph\">Es decir, podemos estimar el valor esperado tomando medidas del estado <marimo-tex class=\"arithmatex\">||(|\\psi\\rangle||)</marimo-tex>, midiendo las probabilidads de las diferentes salidas y obteniendo el valor esperado de <marimo-tex class=\"arithmatex\">||(H||)</marimo-tex> en los estados de la base. (Qiskit nos lo calcula usando <em>Estimator</em>).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "a297c823f8624cbb2bd4c441f20623b8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"calculo-de-langle-xhxrangle-para-un-estado-de-la-base\">C\u00e1lculo de <marimo-tex class=\"arithmatex\">||(\\langle x|H|x\\rangle||)</marimo-tex> para un estado de la base</h4>\n<span class=\"paragraph\">El valor esperado del Hamiltoniano Ising (diagonal) en los vectores de la base se calcula de forma trivial. Para un estado de la base <marimo-tex class=\"arithmatex\">||(|x\\rangle = |x_{n-1}\\dots x_0\\rangle||)</marimo-tex></span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x|Z_iZ_j|x\\rangle = \\langle x_{n-1}\\dots x_0|I\\otimes\\ldots\\otimes Z_i\\otimes\\ldots\\otimes Z_j \\otimes\\ldots\\otimes I|x_{n-1}\\dots x_0\\rangle = \\langle x_i|Z_i|x_i\\rangle \\langle x_j|Z_j|x_j\\rangle\n||]</marimo-tex><span class=\"paragraph\">Y se tiene que:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle 0|Z_i|0\\rangle = 1\\quad \\langle 1|Z_i|1\\rangle = -1\n||]</marimo-tex><span class=\"paragraph\">que podemos escribir como:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x_k|Z_k|x_k\\rangle = (-1)^{x_k}\n||]</marimo-tex><span class=\"paragraph\">de donde se deduce que:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x|Z_iZ_j|x\\rangle = \\langle x_i|Z_i|x_i\\rangle \\langle x_j|Z_j|x_j\\rangle = (-1)^{x_i+x_j}\n||]</marimo-tex><span class=\"paragraph\">Por lo tanto, para un Hamiltoniano Ising:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle x|H|x\\rangle = -\\sum_{(i,j) \\in E} (-1)^{x_i+x_j}J_{ij} -\\sum_j (-1)^{x_j}h_j\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "4f1b529cdbe63ffea695dcda80a29ee2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Ejemplo</strong>: para la malla Ising de tres nodos, calcula el valor esperado del Hamiltoniano <marimo-tex class=\"arithmatex\">||(H = Z_1Z_0-3Z_2Z_1||)</marimo-tex> en el estado <marimo-tex class=\"arithmatex\">||(|110\\rangle||)</marimo-tex></span>\n<span class=\"paragraph\"><em>Soluci\u00f3n</em>:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\langle 110|Z_1Z_0-3Z_2Z_1|110\\rangle = \\langle 110|Z_1Z_0|110\\rangle-3\\langle 110|Z_2Z_1|110\\rangle = (-1)^{1+0}-3(-1)^{1+1} = -4\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "9bc759846a2dd97aa53fe2c39cd059f6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Ejemplo</strong>: para la malla Ising de tres nodos encuentra por fuerza bruta usando Qiskit el valor esperado del Hamiltoniano <marimo-tex class=\"arithmatex\">||(H = Z_1Z_0-3Z_2Z_1||)</marimo-tex> para todos los estados de la base. \u00bfCu\u00e1l o cu\u00e1les son los que lo minimizan?</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "e234f908ea34eac9bb82365e2e89f06a",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "994c7eafb767a272b22162a0d9d68d7b",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "551f555d222086308c326241816315ad",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Los estados <marimo-tex class=\"arithmatex\">||(|001\\rangle||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(|110\\rangle||)</marimo-tex> obtienen el valor esperado m\u00ednimo (-4).</span>\n<span class=\"paragraph\">Estos estados corresponde a <marimo-tex class=\"arithmatex\">||(z_1=z_2=\\pm 1||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(z_0\\ne z_1||)</marimo-tex></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "2bf677a1d819c5d5bde87452e7772750",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"equivalencia-qubo-leftrightarrow-ising\"><strong>Equivalencia QUBO <marimo-tex class=\"arithmatex\">||(\\leftrightarrow||)</marimo-tex> Ising</strong></h2>\n<span class=\"paragraph\">Es f\u00e1cil comprobar que es posible convertir un problema QUBO, con <marimo-tex class=\"arithmatex\">||(x_i\\in \\{0,1\\}||)</marimo-tex>, en un problema Ising, con <marimo-tex class=\"arithmatex\">||(z_i \\in \\{-1,1\\}||)</marimo-tex>, y viceversa, con un simple cambio de variables:</span>\n<marimo-tex class=\"arithmatex\">||[\nz_i = 1 - 2x_i =\n\\begin{cases}\n1, \\text{si } x_i = 0 \\\\\n-1, \\text{si } x_i = 1\n\\end{cases}\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "7ac3af0b4d06aff1bdb94d3cdd33b73f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"ejercicio1\"></a></span>\n<h2 id=\"ejercicio-resolver-max-cut\">\ud83d\udcbb Ejercicio: Resolver MAX-CUT</h2>\n<span class=\"paragraph\">Para el grafo de la imagen, obt\u00e9n la formula anal\u00edtica del problema MAXCUT en formato Ising, haciendo el cambio de variable a partir de la formulaci\u00f3n QUBO, y resuelvelo por fuerza bruta usando Qiskit (crea el Hamiltoniano y obt\u00e9n la energ\u00eda de todos los estados). Indica tambi\u00e9n c\u00f3mo obtener el peso del corte.</span>\n<center><img src=\"https://drive.google.com/uc?export=view&id=1t37PWgnsVWRkX16wcbmFSPZNZ1D0dUOS\" alt=\"Ejemplo MAX-CUT\" width=\"700\"  /></center></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "159404dfeab8ad5e9626c1d13b3bd77d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Para este ejemplo, hab\u00edamos obtenido la funci\u00f3n de coste como:</span>\n<marimo-tex class=\"arithmatex\">||[\nf(x)  = -3x_0- 9x_1-10x_2-16x_3-6x_4 + 6x_0x_1 + 4x_1x_2 + 8x_1x_3 + 14x_2x_3 + 2x_2x_4 + 10x_3x_4\n||]</marimo-tex><span class=\"paragraph\">Para obtener la versi\u00f3n Ising tenemos que hacer el cambio de variable:</span>\n<marimo-tex class=\"arithmatex\">||[\nx_i = \\frac{z_i-1}{2}\n||]</marimo-tex><span class=\"paragraph\">Podemos usar la librer\u00eda SimPy de \u00e1lgebra simb\u00f3lica para obtener la expresi\u00f3n Ising</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "adeb73d1a9cebc824f6baa14ac90e0c8",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "83a84ce1855e74956bd008d3a014abb0",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "b58b8727569ab9f183407a0c82ba6525",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"e6\"></a></span>\n<h1 id=\"ejercicio-entregable-6-suma-de-subconjuntos\"><strong>\u270d\ufe0f Ejercicio entregable 6: suma de subconjuntos</strong></h1>\n<span class=\"paragraph\">Problema de la <a href=\"https://en.wikipedia.org/wiki/Subset_sum_problem\" rel=\"noopener noreferrer\" target=\"_blank\"><strong>suma de subconjuntos</strong></a> (<em>subset sum</em>): dado un conjunto de enteros <marimo-tex class=\"arithmatex\">||(S = \\{s_i\\}||)</marimo-tex> y un entero <marimo-tex class=\"arithmatex\">||(T||)</marimo-tex> \u00bfexiste un subconjunto de <marimo-tex class=\"arithmatex\">||(S||)</marimo-tex> cuya suma sea igual a <marimo-tex class=\"arithmatex\">||(T||)</marimo-tex>?</span>\n<span class=\"paragraph\">Se trata de un problema importante en la teor\u00eda de la complejidad y en la criptograf\u00eda. Se sabe que es NP-completo.</span>\n<span class=\"paragraph\">Escribe en formato QUBO el problema para <marimo-tex class=\"arithmatex\">||(S=\\{-3, 2, -2, 5, 1\\}||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(T=-4||)</marimo-tex>. Igual que antes, obt\u00e9n la formula anal\u00edtica del problema en formato Ising (haciendo el cambio de variable) y resuelvelo por fuerza bruta usando Qiskit (crea el Hamiltoniano y obt\u00e9n la energ\u00eda de todos los estados).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TRpd",
+      "code_hash": "c4c0735820bbbc7eaef485938b726d8f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">x0, x1, x2, x3, x4, x5</span>\n<span class=\"paragraph\">xi = {0,1}</span>\n<span class=\"paragraph\">-3x0 + 2x1 - 2x2 +5x3 -x4 = T\nMINIMIzar</span>\n<span class=\"paragraph\">-3x0 + 2x1 - 2x2 +5x3 -x4 - T = 0</span>\n<span class=\"paragraph\">f(x) = (-3x0 + 2x1 - 2x2 +5x3 -x4 - T)\u00b2</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TXez",
+      "code_hash": "67a4d18527d4a29345ee218b12c085c5",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "dNNg",
+      "code_hash": "8da55f2cbfc435e6fdacca2d9cc91cbf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yCnT",
+      "code_hash": "470945cb983bc615d086549d7af2bc0d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"restricciones\"></a></span>\n<h2 id=\"problemas-de-optimizacion-binaria-con-restricciones\"><strong>Problemas de optimizaci\u00f3n binaria con restricciones</strong></h2>\n<span class=\"paragraph\">La mayor\u00eda de los problemas de optimizaci\u00f3n suelen incluir restricciones:</span>\n<ul>\n<li>Esas restricci\u00f3nes se pueden a\u00f1adir la funci\u00f3n objetivo para obtener un nuevo QUBO.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wlCL",
+      "code_hash": "f5c3ca3fcdce1803ad2cd09101981082",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"programacion-binaria-lineal-blp\"><strong>Programaci\u00f3n binaria lineal (BLP)</strong></h3>\n<span class=\"paragraph\">Problemas de optimizaci\u00f3n binaria con una funci\u00f3n objetivo lineal y restricciones lineales:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{aligned}\n\\text{Minimizar} \\quad &amp; c_0x_0+c_1x_1+\\dots +c_{n-1}x_{n-1} \\\\\n\\text{sujeto a} \\quad &amp; Ax \\le b, \\\\\n&amp; x_i = \\{0,1\\}\n\\end{aligned}\n||]</marimo-tex><span class=\"paragraph\">con <marimo-tex class=\"arithmatex\">||(c_i,a_{ij},b_j \\in \\mathbb{Z}||)</marimo-tex> (se pueden extender a coeficientes reales).</span>\n<span class=\"paragraph\">Es posible escribir un problema de este tipo como un problema QUBO usando variables de holgura (<em>slack variables</em>) y  t\u00e9rminos de penalizaci\u00f3n (<em>penalty terms</em>).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "kqZH",
+      "code_hash": "4ceb8dab2dc39ef5d87a3a23cba29df1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Ejemplo</strong>:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{aligned}\n\\text{Minimizar} \\quad &amp; -5x_0+3x_1-2x_2 \\\\\n\\text{sujeto a} \\quad &amp; x_0+x_2 \\le 1, \\\\\n&amp; 3x_0-x_1+3x_2 \\le 4 \\\\\n&amp; x_i = \\{0,1\\}\n\\end{aligned}\n||]</marimo-tex><span class=\"paragraph\">Paso 1: Convertir las restricciones de desigualdad en igualdades usando <strong>variables de holgura binarias</strong>.</span>\n<marimo-tex class=\"arithmatex\">||[\nx_0+x_2 \\le 1 \\Leftrightarrow  x_0+x_2+s_0 = 1, \\text{ con } s_0\\in\\{0,1\\}\n||]</marimo-tex><marimo-tex class=\"arithmatex\">||[\n3x_0-x_1+3x_2 \\le 4 \\Leftrightarrow  3x_0-x_1+3x_2 + s_1 = 4, \\text{ con } s_1\\in [0,5]\n||]</marimo-tex><span class=\"paragraph\">El valor de <marimo-tex class=\"arithmatex\">||(s_1||)</marimo-tex> en este caso viene dado porque el valor m\u00ednimo de <marimo-tex class=\"arithmatex\">||(3x_0-x_1+3x_2||)</marimo-tex> es <marimo-tex class=\"arithmatex\">||(-1||)</marimo-tex>, por lo que la igualdad se verifica con <marimo-tex class=\"arithmatex\">||(s_1=5||)</marimo-tex>.</span>\n<span class=\"paragraph\">Podemos expresar <marimo-tex class=\"arithmatex\">||(s_1||)</marimo-tex> con variables binarias haciendo:</span>\n<marimo-tex class=\"arithmatex\">||[\ns_1 = s_{11}+2s_{12}+2s_{13}, \\text{ con } s_{1i}\\in\\{0,1\\}\n||]</marimo-tex><span class=\"paragraph\">De esta forma, el problema original se puede escribir como:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{aligned}\n\\text{Minimizar} \\quad &amp; -5x_0+3x_1-2x_2 \\\\\n\\text{sujeto a} \\quad &amp; x_0+x_2+s_0-1 = 0, \\\\\n&amp; 3x_0-x_1+3x_2+s_{11}+2s_{12}+2s_{13}-4=0 \\\\\n&amp; x_i,s_i = \\{0,1\\}\n\\end{aligned}\n||]</marimo-tex><span class=\"paragraph\">Las dos restricciones las podemos incluir en la funci\u00f3n a minimizar como <strong>t\u00e9rminos de penalizaci\u00f3n</strong> para obtener una formulaci\u00f3n QUBO:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{aligned}\n\\text{Minimizar} \\quad &amp; -5x_0+3x_1-2x_2+P(x_0+x_2+s_0-1)^2+P(3x_0-x_1+3x_2+s_{11}+2s_{12}+2s_{13}-4)^2 \\\\\n &amp; \\text{con }x_i,s_i = \\{0,1\\}\n\\end{aligned}\n||]</marimo-tex><span class=\"paragraph\">siendo <marimo-tex class=\"arithmatex\">||(P||)</marimo-tex> una constante entera (denominada <em>multiplicador de Lagrange</em>) suficientemente grande para garantizar que no se escoge una soluci\u00f3n que no cumpla las restricciones.</span>\n<span class=\"paragraph\">Por ejemplo, en este ejemplo como <marimo-tex class=\"arithmatex\">||(-5x_0+3x_1-2x_2 \\in [-7,3]||)</marimo-tex> si se toma $\nP=11$ cualquier soluci\u00f3n que no verifique alguna de las restricciones no ser\u00e1 m\u00ednima.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wAgl",
+      "code_hash": "f434e9ac435fa8496192aeea9b8fa4f7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"seleccion-de-los-multiplicadores-de-lagrange\">Selecci\u00f3n de los multiplicadores de Lagrange</h4>\n<ul>\n<li>Si <marimo-tex class=\"arithmatex\">||(P||)</marimo-tex> es demasiado peque\u00f1o, se van a obtener soluciones que no verifiquen las restricciones.</li>\n<li>Si <marimo-tex class=\"arithmatex\">||(P||)</marimo-tex> es demasiado grande pueden aparecer problemas de mal condicionamiento num\u00e9rico y mayor probabilidad de caer en m\u00ednimos locales.</li>\n</ul>\n<span class=\"paragraph\">Como regla, se puede elegir <marimo-tex class=\"arithmatex\">||(P||)</marimo-tex> de forma que los valores de la penalizaci\u00f3n est\u00e9n en el orden de los valores del objetivo.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "rEll",
+      "code_hash": "ed549b6c05b3037cbaa822c4d613e275",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"otros\"></a></span>\n<h2 id=\"otros-problemas-de-optimizacion\"><strong>Otros problemas de optimizaci\u00f3n</strong></h2>\n<span class=\"paragraph\">Existen otras formulaciones para problemas de optimizaci\u00f3n, seg\u00fan el tipo de variables y la imposici\u00f3n de restricciones:</span>\n<span class=\"paragraph\">Algunos ejemplos son:</span>\n<ul>\n<li>\n<span class=\"paragraph\">Programaci\u00f3n entera lineal (<em>Integer Lineal Programming</em>, ILP).</span>\n<ul>\n<li>Variables <marimo-tex class=\"arithmatex\">||(x_i\\in \\mathbb{Z}||)</marimo-tex>.</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Programaci\u00f3n cuadr\u00e1tica con restricciones cuadr\u00e1ticas (<em>Quadratically Constrained Quadratic Programming</em>, QCQP).</span>\n<ul>\n<li>Funci\u00f3n objetivo cuadr\u00e1tica y restricciones cuadr\u00e1ticas</li>\n</ul>\n</li>\n</ul>\n<span class=\"paragraph\">Este tipo de problemas pueden expresarse como problemas QUBO con ciertas limitaciones.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dGlV",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SdmI",
+      "code_hash": "d4753ac5961d842096859e1fd898c5f3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"adiabatica\"></a></span>\n<h1 id=\"computacion-cuantica-adiabatica-y-quantum-annealing\"><strong>Computaci\u00f3n cu\u00e1ntica adiab\u00e1tica y Quantum Annealing</strong></h1>\n<span class=\"paragraph\">La computaci\u00f3n cu\u00e1ntica adiab\u00e1tica es una forma alternativa de computaci\u00f3n cu\u00e1ntica basada en la evoluci\u00f3n temporal de un Hamiltoniano y en el <a href=\"https://en.wikipedia.org/wiki/Adiabatic_theorem\" rel=\"noopener noreferrer\" target=\"_blank\">teorema adiab\u00e1tico</a></span>\n<h4 id=\"ecuacion-de-schrodinger\">Ecuaci\u00f3n de Schr\u00f6dinger</h4>\n<span class=\"paragraph\">La evoluci\u00f3n temporal de un sistema cu\u00e1ntico viene dada por la ecuaci\u00f3n de Schr\u00f6dinger dependiente del tiempo:</span>\n<marimo-tex class=\"arithmatex\">||[i\\hbar \\frac{d}{d t}|\\psi(t)\\rangle = H(t)|\\psi(t)\\rangle||]</marimo-tex><span class=\"paragraph\"><marimo-tex class=\"arithmatex\">||(H(t)||)</marimo-tex> es el Hamiltoniano del sistema en el instante <marimo-tex class=\"arithmatex\">||(t||)</marimo-tex> y define la energ\u00eda del mismo.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lgWD",
+      "code_hash": "e41c2604420d5cae2180458e4beaebee",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"teorema-adiabatico\">Teorema adiab\u00e1tico</h4>\n<span class=\"paragraph\">Si un sistema cu\u00e1ntico est\u00e1 en un estado base (estado de menor energ\u00eda o <em>ground state</em>) de un Hamiltoniano inicial y se le hace evolucionar muy lentamente hacia un Hamiltoniano final, este estado inicial evolucionar\u00e1 al estado base del Hamiltoniano final, tras un tiempo suficientemente largo.</span>\n<span class=\"paragraph\">Supongamos que tenemos un Hamiltoniano <marimo-tex class=\"arithmatex\">||(H_c||)</marimo-tex> (<em>Hamiltoniano de coste</em>) cuyo estado base codifica la soluci\u00f3n de nuestro problema.</span>\n<span class=\"paragraph\">Partimos de un Hamiltoniano <marimo-tex class=\"arithmatex\">||(H_0||)</marimo-tex> cuyo estado base es facil de preparar y queremos llegar, en un tiempo <marimo-tex class=\"arithmatex\">||(T||)</marimo-tex>, al estado base de <marimo-tex class=\"arithmatex\">||(H_c||)</marimo-tex>. Hacemos evolucionar el sistema desde <marimo-tex class=\"arithmatex\">||(t=0||)</marimo-tex> hasta <marimo-tex class=\"arithmatex\">||(t=T||)</marimo-tex> como sigue:</span>\n<marimo-tex class=\"arithmatex\">||[H(t) = A(t)H_0 + B(t)H_c||]</marimo-tex><span class=\"paragraph\">donde las funciones <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(B||)</marimo-tex> verifican: <marimo-tex class=\"arithmatex\">||(A(0) = B(T) = 1||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(A(T) = B(0) = 0||)</marimo-tex>.</span>\n<span class=\"paragraph\">Un ejemplo de estas funciones son</span>\n<marimo-tex class=\"arithmatex\">||[\nA(t) =  \\left(1-\\frac{t}{T}\\right)\\\\\nB(t) = \\frac{t}{T}\n||]</marimo-tex><span class=\"paragraph\">Si <marimo-tex class=\"arithmatex\">||(t||)</marimo-tex> cambia muy lentamente, el sistema pasa de <marimo-tex class=\"arithmatex\">||(H(0) = H_0||)</marimo-tex> a <marimo-tex class=\"arithmatex\">||(H(T) = H_c||)</marimo-tex> manteni\u00e9ndose en el estado base.</span>\n<span class=\"paragraph\">Midiendo el estado del sistema en <marimo-tex class=\"arithmatex\">||(t=T||)</marimo-tex> obtenemos el estado <marimo-tex class=\"arithmatex\">||(|\\psi\\rangle||)</marimo-tex> que minimiza <marimo-tex class=\"arithmatex\">||(\\langle\\psi|H_c|\\psi\\rangle||)</marimo-tex> y que es la soluci\u00f3n del problema.</span>\n<span class=\"paragraph\">En <a href=\"https://doi.org/10.1137/080734479\" rel=\"noopener noreferrer\" target=\"_blank\">Aharonov et al. 2007</a> se demostr\u00f3 que la computaci\u00f3n cu\u00e1ntica adiab\u00e1tica es equivalente a la computaci\u00f3n cu\u00e1ntica basada en puertas.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yOPj",
+      "code_hash": "003233636c6f517901c14fbab793c60b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"quantum-annealing\"><strong>Quantum annealing</strong></h2>\n<span class=\"paragraph\">La computaci\u00f3n cu\u00e1ntica adiab\u00e1tica pura no es viable: el tiempo de evoluci\u00f3n <marimo-tex class=\"arithmatex\">||(T||)</marimo-tex> puede ser demasiado grande.</span>\n<span class=\"paragraph\">El Quantum annealing (QA) es un modelo similar a la computaci\u00f3n cu\u00e1ntica adiab\u00e1tica, con ciertas limitaciones:</span>\n<ul>\n<li>El Hamiltoniano final tiene que ser un Hamiltoniano Ising:</li>\n</ul>\n<marimo-tex class=\"arithmatex\">||[\nH_c = -\\sum_{i,j=0}^{n-1} J_{ij}Z_iZ_j - \\sum_{i=0}^{n-1} h_{i}Z_i\n||]</marimo-tex><ul>\n<li>No se mantiene la evoluci\u00f3n adiab\u00e1tica <marimo-tex class=\"arithmatex\">||(\\implies||)</marimo-tex> el estado final podr\u00eda no ser el estado base de <marimo-tex class=\"arithmatex\">||(H_c||)</marimo-tex></li>\n</ul>\n<span class=\"paragraph\"><strong>Estado inicial <marimo-tex class=\"arithmatex\">||(H_0||)</marimo-tex></strong></span>\n<span class=\"paragraph\">Se suele usar como estado inicial el siguiente Hamiltoniano:</span>\n<marimo-tex class=\"arithmatex\">||[\nH_0 = -\\sum_{i=0}^{n-1} X_i\n||]</marimo-tex><span class=\"paragraph\">Este estado se denomina <em>mixing Hamiltonian</em> y su estado de menor energ\u00eda es <marimo-tex class=\"arithmatex\">||(|\\psi_0\\rangle = |+\\rangle^{\\otimes n}||)</marimo-tex></span>\n<span class=\"paragraph\"><strong>Evoluci\u00f3n del Hamiltoniano</strong></span>\n<span class=\"paragraph\">La evoluci\u00f3n viene dada por:</span>\n<marimo-tex class=\"arithmatex\">||[\nH(t) = A(t)H_0 + B(t)H_c = -A(t)\\sum_{i=0}^{n-1} X_i - B(t)\\sum_{i,j=0}^{n-1} J_{ij}Z_iZ_j - B(t)\\sum_{i=0}^{n-1} h_{i}Z_i\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "fwwy",
+      "code_hash": "bc840780b9b88a132f0891cb879efe6c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"quantum-annealers\"><strong>Quantum annealers</strong></h2>\n<span class=\"paragraph\">Computadores cu\u00e1nticos que resuelven problemas de optimizaci\u00f3n mediante Quantum annealing.</span>\n<ul>\n<li>\n<span class=\"paragraph\"><a href=\"https://www.dwavesys.com/\" rel=\"noopener noreferrer\" target=\"_blank\">D-Wave Systems</a>: Primera empresa en vender quantum annealers</span>\n<ul>\n<li>\n<span class=\"paragraph\">\u00daltimo modelo <a href=\"https://www.dwavequantum.com/solutions-and-products/systems/\" rel=\"noopener noreferrer\" target=\"_blank\">Advantage 2</a></span>\n<div class=\"language-tsql highlight\"><pre><span></span><code><span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">M\u00e1s</span><span class=\"w\"> </span><span class=\"n\">de</span><span class=\"w\"> </span><span class=\"mi\">4400</span><span class=\"w\"> </span><span class=\"n\">c\u00fabits</span><span class=\"w\"> </span><span class=\"n\">superconductores</span>\n\n<span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">Topolog\u00eda</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"n\">Zephyr</span><span class=\"o\">]</span><span class=\"p\">(</span><span class=\"nl\">https</span><span class=\"p\">:</span><span class=\"o\">//</span><span class=\"n\">www</span><span class=\"p\">.</span><span class=\"n\">dwavequantum</span><span class=\"p\">.</span><span class=\"n\">com</span><span class=\"o\">/</span><span class=\"n\">media</span><span class=\"o\">/</span><span class=\"mi\">2</span><span class=\"n\">uznec4s</span><span class=\"o\">/</span><span class=\"mi\">14</span><span class=\"o\">-</span><span class=\"mi\">1056</span><span class=\"n\">a</span><span class=\"o\">-</span><span class=\"n\">a_zephyr_topology_of_d</span><span class=\"o\">-</span><span class=\"n\">wave_quantum_processors</span><span class=\"p\">.</span><span class=\"n\">pdf</span><span class=\"p\">)</span>\n</code></pre></div>\n</li>\n<li>\n<span class=\"paragraph\">Suite Ocean: incluye diferentes paquetes, entre otros:</span>\n<ul>\n<li>dwave-system: para enviar problemas a los sistemas cu\u00e1nticos de D-Wave (incluyendo a trav\u00e9s del servicio en la nube <a href=\"https://cloud.dwavesys.com/\" rel=\"noopener noreferrer\" target=\"_blank\">Leap</a>).</li>\n<li><a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/index.html\" rel=\"noopener noreferrer\" target=\"_blank\">dimod</a>: para definir estructuras de datos y modelos matem\u00e1ticos de diferentes tipos de problemas.</li>\n<li><a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dnx/index.html\" rel=\"noopener noreferrer\" target=\"_blank\">dwave-networkx</a>: integraci\u00f3n con NetworkX para grafos.</li>\n</ul>\n</li>\n<li>Tipo de problemas: optimizaci\u00f3n de portfolios, optimizaci\u00f3n de rutas y gesti\u00f3n de flotas, optimizaci\u00f3n de l\u00edneas de producci\u00f3n, b\u00fasqueda de similaridad entre mol\u00e9culas, etc.</li>\n</ul>\n</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "LJZf",
+      "code_hash": "896a1eca0de8a47e8bc0f76e3afc4df4",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "urSm",
+      "code_hash": "43cc8234f17738e1a6f2b9d314f8018e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Para obtener la versi\u00f3n instalada:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "jxvo",
+      "code_hash": "ae8f53ca67b73980a265f01257bfd3b3",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "mWxS",
+      "code_hash": "c392bfb30b7daa8b1fe6662fb35c93dc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">DWave ofrec\u00eda un acceso gratuito general (limitado) a sus sistemas, pero lo cancel\u00f3 en enero de 2025:</span>\n<div class=\"language-text highlight\"><pre><span></span><code>- El programa [Leap Quantum LaunchPad](https://www.dwavequantum.com/quantum-launchpad/) proporciona acceso por 3 meses a usuarios cualificados.\n</code></pre></div>\n<span class=\"paragraph\">Al darse de alta, se obtiene una API key que se configura ejecutando:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CcZR",
+      "code_hash": "f47e50f1f36b29c955f1ce5cc45d7bb0",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "YWSi",
+      "code_hash": "f41710e0eec75f4d2b9cfae86a05dcb1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"solvers\">Solvers</h2>\n<span class=\"paragraph\">Dwave proporciona diferentes resolutores (o <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html\" rel=\"noopener noreferrer\" target=\"_blank\"><em>samplers</em></a>) seg\u00fan el tipo de problema y el hardware que se utiliza.</span>\n<ul>\n<li>\n<span class=\"paragraph\"><a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html#dwavesampler\" rel=\"noopener noreferrer\" target=\"_blank\">DWaveSampler</a>: sampler que env\u00eda problemas Binary Quadratic Model (BQM) (es decir, QUBO o Ising) directamente al Annealer</span>\n<ul>\n<li>Utiliza problemas expresados como una matriz QUBO o a trav\u00e9s de <em>dimod</em></li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Solvers h\u00edbridos (Leap Hybrid Solver Service (HSS))</span>\n<ul>\n<li>\n<span class=\"paragraph\">Solvers h\u00edbridos accesibles a trav\u00e9s de Leap</span>\n<ul>\n<li>Utilizan sistemas cl\u00e1sicos y cu\u00e1nticos</li>\n</ul>\n</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Resolutores cl\u00e1sicos:</span>\n<ul>\n<li>dimod.ExactSolver: resolutor por fuerza bruta</li>\n<li>SimulatedAnnealingSampler: solver basado recocido simulado</li>\n</ul>\n</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "zlud",
+      "code_hash": "78445f8ce52b6b8c579a0a164b31bc39",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"resolutores-samplers-hibridos\">Resolutores (samplers) h\u00edbridos</h4>\n<span class=\"paragraph\">Sistemas h\u00edbridos cu\u00e1ntico/cl\u00e1sicos en la nube para resolver problemas formulados como modelos cuadr\u00e1ticos o no lineales.</span>\n<ul>\n<li>\n<span class=\"paragraph\">Hybrid BQM sampler (<a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html/leaphybridsampler\" rel=\"noopener noreferrer\" target=\"_blank\">LeapHybridSampler</a>):</span>\n<ul>\n<li>Modelos BQM m\u00e1s grandes de los que se pueden mandar directemente al annealer</li>\n<li>Manda casi todo al annealer; la parte h\u00edbrida ayuda con la selecci\u00f3n de par\u00e1metros, la escalabilidad y postprocesamiento.</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Hybrid CQM sampler (<a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html#leaphybridcqmsampler\" rel=\"noopener noreferrer\" target=\"_blank\">LeapHybridCQMSampler</a>):</span>\n<ul>\n<li>Modelos cuadr\u00e1ticos con restricciones lineales o cuadr\u00e1ticas</li>\n<li>Variables binarias, enteras y/o reales</li>\n<li>Acepta restricciones <strong>blandas</strong> y <strong>duras</strong></li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Hybrid DQM sampler (<a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html#leaphybriddqmsampler\" rel=\"noopener noreferrer\" target=\"_blank\">LeapHybridDQMSampler</a>):</span>\n<ul>\n<li>Funciones cuadr\u00e1ticas en variables discretas categ\u00f3ricas</li>\n<li>Las variables deben tomar valores de un conjunto finito y discreto</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Hybrid nonlinear-program sampler (<a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html#leaphybridnlsampler\" rel=\"noopener noreferrer\" target=\"_blank\">LeapHybridNLSampler</a>):</span>\n<ul>\n<li>Modelos de optimizaci\u00f3n no lineal en variables continuas o discretas.</li>\n<li>Funciones objetivo y restricciones arbitrarias, incluyendo t\u00e9rminos no polin\u00f3micos</li>\n<li>Permite proporcionar estados de partida para acelerar la b\u00fasqueda</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\"><a href=\"https://docs.dwavequantum.com/en/latest/industrial_optimization/dwave_hybrid.html\" rel=\"noopener noreferrer\" target=\"_blank\">dwave-hybrid</a> permite crear un sampler h\u00edbrido personalizado</span>\n<ul>\n<li>Permite combinar m\u00e9todos cl\u00e1sicos y cu\u00e1nticos en pipelines, iteraciones y workflows flexibles.</li>\n</ul>\n</li>\n</ul>\n<span class=\"paragraph\">Estos solver pueden resultar m\u00e1s eficientes que usar solo el annealer.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "tZnO",
+      "code_hash": "ec7866229448d003bdf5e5b9a829863e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"dimod\">dimod</h2>\n<span class=\"paragraph\"><a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/\" rel=\"noopener noreferrer\" target=\"_blank\">dimod</a> es la biblioteca base de D-Wave Ocean para representar distintos modelos de problemas con y sin restricciones, como los siguientes:</span>\n<div class=\"language-tsql highlight\"><pre><span></span><code><span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">Modelos</span><span class=\"w\"> </span><span class=\"n\">cuadr\u00e1ticos</span><span class=\"w\"> </span><span class=\"n\">binarios</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"n\">BQM</span><span class=\"p\">),</span><span class=\"w\"> </span><span class=\"n\">como</span><span class=\"w\"> </span><span class=\"n\">QUBO</span><span class=\"w\"> </span><span class=\"n\">o</span><span class=\"w\"> </span><span class=\"nl\">Ising</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"n\">clase</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"n\">BinaryQuadraticModel</span><span class=\"o\">]</span><span class=\"p\">(</span><span class=\"nl\">https</span><span class=\"p\">:</span><span class=\"o\">//</span><span class=\"n\">docs</span><span class=\"p\">.</span><span class=\"n\">dwavequantum</span><span class=\"p\">.</span><span class=\"n\">com</span><span class=\"o\">/</span><span class=\"n\">en</span><span class=\"o\">/</span><span class=\"n\">latest</span><span class=\"o\">/</span><span class=\"n\">ocean</span><span class=\"o\">/</span><span class=\"n\">api_ref_dimod</span><span class=\"o\">/</span><span class=\"n\">models</span><span class=\"p\">.</span><span class=\"n\">html#module</span><span class=\"o\">-</span><span class=\"n\">dimod</span><span class=\"p\">.</span><span class=\"nc\">binary</span><span class=\"p\">.</span><span class=\"n\">binary_quadratic_model</span><span class=\"p\">)</span>\n\n<span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">Modelos</span><span class=\"w\"> </span><span class=\"n\">cuadr\u00e1ticos</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"n\">QM</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"n\">con</span><span class=\"w\"> </span><span class=\"n\">variables</span><span class=\"w\"> </span><span class=\"n\">binarias</span><span class=\"w\"> </span><span class=\"n\">o</span><span class=\"w\"> </span><span class=\"nl\">enteras</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"n\">clase</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"n\">QuadraticModel</span><span class=\"o\">]</span><span class=\"p\">(</span><span class=\"nl\">https</span><span class=\"p\">:</span><span class=\"o\">//</span><span class=\"n\">docs</span><span class=\"p\">.</span><span class=\"n\">dwavequantum</span><span class=\"p\">.</span><span class=\"n\">com</span><span class=\"o\">/</span><span class=\"n\">en</span><span class=\"o\">/</span><span class=\"n\">latest</span><span class=\"o\">/</span><span class=\"n\">ocean</span><span class=\"o\">/</span><span class=\"n\">api_ref_dimod</span><span class=\"o\">/</span><span class=\"n\">models</span><span class=\"p\">.</span><span class=\"n\">html#module</span><span class=\"o\">-</span><span class=\"n\">dimod</span><span class=\"p\">.</span><span class=\"n\">quadratic</span><span class=\"p\">.</span><span class=\"n\">quadratic_model</span><span class=\"p\">)</span>\n\n<span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">Modelos</span><span class=\"w\"> </span><span class=\"n\">cuadr\u00e1ticos</span><span class=\"w\"> </span><span class=\"n\">con</span><span class=\"w\"> </span><span class=\"n\">restricciones</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"n\">CQM</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"n\">y</span><span class=\"w\"> </span><span class=\"n\">variables</span><span class=\"w\"> </span><span class=\"n\">binarias</span><span class=\"p\">,</span><span class=\"w\"> </span><span class=\"n\">enteras</span><span class=\"w\"> </span><span class=\"n\">o</span><span class=\"w\"> </span><span class=\"nl\">reales</span><span class=\"p\">:</span><span class=\"w\"> </span><span class=\"n\">clase</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"n\">ConstrainedQuadraticModel</span><span class=\"o\">]</span><span class=\"p\">(</span><span class=\"nl\">https</span><span class=\"p\">:</span><span class=\"o\">//</span><span class=\"n\">docs</span><span class=\"p\">.</span><span class=\"n\">dwavequantum</span><span class=\"p\">.</span><span class=\"n\">com</span><span class=\"o\">/</span><span class=\"n\">en</span><span class=\"o\">/</span><span class=\"n\">latest</span><span class=\"o\">/</span><span class=\"n\">ocean</span><span class=\"o\">/</span><span class=\"n\">api_ref_dimod</span><span class=\"o\">/</span><span class=\"n\">models</span><span class=\"p\">.</span><span class=\"n\">html#module</span><span class=\"o\">-</span><span class=\"n\">dimod</span><span class=\"p\">.</span><span class=\"n\">constrained</span><span class=\"p\">.</span><span class=\"n\">constrained</span><span class=\"p\">)</span>\n\n<span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">Modelos</span><span class=\"w\"> </span><span class=\"n\">discretos</span><span class=\"w\"> </span><span class=\"n\">cuadr\u00e1ticos</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"n\">DQM</span><span class=\"p\">)</span><span class=\"err\">:</span><span class=\"w\"> </span><span class=\"n\">clase</span><span class=\"w\"> </span><span class=\"o\">[</span><span class=\"n\">DiscreteQuadraticModel</span><span class=\"o\">]</span><span class=\"p\">(</span><span class=\"nl\">https</span><span class=\"p\">:</span><span class=\"o\">//</span><span class=\"n\">docs</span><span class=\"p\">.</span><span class=\"n\">dwavequantum</span><span class=\"p\">.</span><span class=\"n\">com</span><span class=\"o\">/</span><span class=\"n\">en</span><span class=\"o\">/</span><span class=\"n\">latest</span><span class=\"o\">/</span><span class=\"n\">ocean</span><span class=\"o\">/</span><span class=\"n\">api_ref_dimod</span><span class=\"o\">/</span><span class=\"n\">models</span><span class=\"p\">.</span><span class=\"n\">html#discrete</span><span class=\"o\">-</span><span class=\"n\">quadratic</span><span class=\"o\">-</span><span class=\"n\">models</span><span class=\"p\">)</span>\n</code></pre></div>\n<span class=\"paragraph\">Tambi\u00e9n incluye otras funcionalidades como diferentes resolutores cl\u00e1sicos, por ejemplo solvers por fuerza bruta como <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/sampler_composites.html#exact-solver\" rel=\"noopener noreferrer\" target=\"_blank\">ExactSolver</a>,  <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/sampler_composites.html#exact-cqm-solver\" rel=\"noopener noreferrer\" target=\"_blank\">ExactCQMSolver</a> y <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/sampler_composites.html#exact-dqm-solver\" rel=\"noopener noreferrer\" target=\"_blank\">ExactDQMSolver</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xvXZ",
+      "code_hash": "ca93fc07170d64cb44bb6e9c0015e211",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"ejemplo-resolver-problema-ising-con-dwavesampler\"><strong>Ejemplo</strong>: Resolver problema Ising con DWaveSampler</h3>\n<center><img src=\"https://drive.google.com/uc?export=view&id=1pHIFMBSBWWciVhG1ll_SAKibigkHOiKz\" alt=\"Malla Ising 3 nodos\" width=\"350\"  /></center>\n\n<span class=\"paragraph\">El Hamiltoniano Ising de esta malla es:</span>\n<marimo-tex class=\"arithmatex\">||[\nH = -\\sum_{(i,j) \\in E} J_{ij} Z_iZ_j - \\sum_j h_j Z_j = Z_0Z_1 - 3Z_1Z_2\n||]</marimo-tex><span class=\"paragraph\">Es decir, <marimo-tex class=\"arithmatex\">||(J_{01}=-1||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(J_{12} = 3||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(h_j=0||)</marimo-tex>.</span>\n<span class=\"paragraph\">Lo expresamos como un BQM en dimod.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CLip",
+      "code_hash": "db986a6cbcb6c8c79455be322880fcb3",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "YECM",
+      "code_hash": "633450006b0f79efd88be3477c53cc76",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"resolver-en-el-annealer-a-traves-de-leap\">Resolver en el Annealer a trav\u00e9s de <a href=\"https://cloud.dwavesys.com/leap\" rel=\"noopener noreferrer\" target=\"_blank\">Leap</a></h4>\n<span class=\"paragraph\">Si tenemos acceso a los sistemas en la nube, para resolver el problema en un quantum annealer de DWave, har\u00edamos:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "cEAS",
+      "code_hash": "806d68333603dddb2f3f96c5ed0dfa95",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "iXej",
+      "code_hash": "b8873200f3680bf11b3f38136ae085af",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Principales funciones:</span>\n<ul>\n<li><a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html#dwavesampler\" rel=\"noopener noreferrer\" target=\"_blank\">DWaveSampler</a>: indica que se use un annealer como solver.</li>\n<li><a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/composites.html#dwave.system.composites.EmbeddingComposite\" rel=\"noopener noreferrer\" target=\"_blank\">EmbeddingComposite</a>: mapea el problema en la configuraci\u00f3n f\u00edsica del sistema DWave.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "EJmg",
+      "code_hash": "222d854912804121fd57b368a242f2ca",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"solucion-exacta-y-con-annealing-simulado\">Soluci\u00f3n exacta y con annealing simulado</h3>\n<span class=\"paragraph\">Dimod incluye un resolutor por fuerza bruta, que prueba todas las posibles combinaciones</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "UmEG",
+      "code_hash": "3d1ab284fba49edf4d2300d5dec5e288",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "vEBW",
+      "code_hash": "9b936e9ffc2e8000833b9fe9621b34c3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Podemos usar el simulador basado en annealing simulado</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "kLmu",
+      "code_hash": "c15963e306cd8e69d0ce25e411d058e4",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "IpqN",
+      "code_hash": "d5f24ee654dfdc47fdd4e197e5d22f70",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dxZZ",
+      "code_hash": "fc8e7fa62c187808d047d30cd7dde5c2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"ejemplo-resolver-problema-qubo\"><strong>Ejemplo</strong>: Resolver problema QUBO</h3>\n<span class=\"paragraph\">MAXCUT del grafo:</span>\n<center><img src=\"https://drive.google.com/uc?export=view&id=1t37PWgnsVWRkX16wcbmFSPZNZ1D0dUOS\" alt=\"Ejemplo MAX-CUT\" width=\"700\"  /></center>\n\n<span class=\"paragraph\">Para este ejemplo, la funci\u00f3n a minimizar era:</span>\n<marimo-tex class=\"arithmatex\">||[\nf(x)  = -3x_0- 9x_1-10x_2-16x_3-6x_4 + 6x_0x_1 + 4x_1x_2 + 8x_1x_3 + 14x_2x_3 + 2x_2x_4 + 10x_3x_4\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dlnW",
+      "code_hash": "4e37827eb971af0ef7c526928fed21e2",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "TTti",
+      "code_hash": "83ae056cb1dedd3b7a11fb245f2d00e5",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "RKFZ",
+      "code_hash": "ab666d8d910ac9a11c24535ec7d61f33",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Tambi\u00e9n podemos definir el problema a partir de la matriz Q del QUBO.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "IaQp",
+      "code_hash": "f727c696f10d6bdfc58a309f73315d4d",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "IWgg",
+      "code_hash": "520cea1b9259206b467d374a671f8716",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"uso-de-dwave-networkx\">Uso de <em>dwave-networkx</em></h3>\n<span class=\"paragraph\">El m\u00f3dulo dwave-networkx incluye m\u00e9todos para resolver problemas de grafos, como el MAXCUT</span>\n<ul>\n<li>El grafo debe definirse usando la librer\u00eda <em>networkx</em> de Python</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "fCoF",
+      "code_hash": "538847501311b83330d5ff3265cccdbb",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "LkGn",
+      "code_hash": "d5f24ee654dfdc47fdd4e197e5d22f70",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "zVRe",
+      "code_hash": "9683dece8fcc3af89c6f9a4dd6ccf14b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"problemas-binarios-cuadraticos-con-restricciones-cqm\"><strong>Problemas binarios cuadr\u00e1ticos con restricciones (CQM)</strong></h2>\n<span class=\"paragraph\">Supongamos un problema como este:\n\\begin{align<em>}\n\\text{Minimizar}\\quad &amp; -5x_0 +3 x_1 - 2x_2 \\\n\\text{sujeto a}\\quad &amp; x_0+x_2 \\le 1, \\\n&amp; 3x_0-x_1+3x_2 \\le 4,\\\n&amp; x_j \\in {0,1}, j=0,1,2\n\\end{align</em>}</span>\n<span class=\"paragraph\">Usando dimod lo expresamos como un problema CQM (<em>Constrained cuadratic Model</em>) de la siguiente forma:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "woaO",
+      "code_hash": "4220a9d328b9445941acd858c263f09e",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "HnMC",
+      "code_hash": "eb309b7276c212c2e328f878995c8c1e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Esta forma de expresar el problema (<em>symbolic math</em>) puede no ser \u00fatil en problemas reales.</span>\n<span class=\"paragraph\">Otra forma de hacer lo mismo:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wadT",
+      "code_hash": "ae742f524831fbedefe8a43359e2365c",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "VCRE",
+      "code_hash": "a43c4c35ce70a4b08c403482b986c0d5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Lo resolvemos por fuerza bruta usando el <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/sampler_composites.html#exact-cqm-solver\" rel=\"noopener noreferrer\" target=\"_blank\">ExactCQMSolver</a> de dimod</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "hgqU",
+      "code_hash": "d8fb7a30cedfb43743a6d8b20e87544b",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "PSUk",
+      "code_hash": "c868b02fc427b171622d8270ff1dca33",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Entre las soluciones, incluye aquellas que no son factibles.</span>\n<span class=\"paragraph\">Para quedarnos con las soluciones que cumplen las restricciones, hacemos:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "mfOT",
+      "code_hash": "c10ae0ea420362512241b3757791ccf9",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "vGiW",
+      "code_hash": "53eccb802daa55cd2585f6b694d1b119",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"resolver-cqm-en-el-annealer\">Resolver CQM en el Annealer</h3>\n<span class=\"paragraph\">Para resolver el problema CQM en el Quantum Annealer hay dos opciones:</span>\n<ol>\n<li>Usar un solver h\u00edbrido en Leap (en concreto, el <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_system/samplers.html#leaphybridcqmsampler\" rel=\"noopener noreferrer\" target=\"_blank\">LeapHybridCQMSampler</a>)</li>\n<li>Convertir el problema en un BQM sin restricciones y usar DWaveSampler (o SimulatedAnnealingSampler para resolverlo en un sistema cl\u00e1sico)</li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SYQT",
+      "code_hash": "477ab68fb61bbe060be6084c1326ecee",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"solucion-usando-un-hybrid-cqm-solver\">Soluci\u00f3n usando un Hybrid CQM Solver</h4></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bMrW",
+      "code_hash": "4ae4a86bf9318dc434f332838e3c4b3c",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "PSQn",
+      "code_hash": "0a5f3d03cd721ddfbb1e3644672df1ef",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"solucion-convirtiendo-a-bqm\">Soluci\u00f3n convirtiendo a BQM</h4>\n<span class=\"paragraph\">Dimod tiene una utilidad que convierte de CQM a BQM sin restricciones: <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/generated/dimod.cqm_to_bqm.html\" rel=\"noopener noreferrer\" target=\"_blank\"><code>dimod.cqm_to_bqm</code></a></span>\n<div class=\"language-gdscript highlight\"><pre><span></span><code><span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">Convierte</span><span class=\"w\"> </span><span class=\"n\">el</span><span class=\"w\"> </span><span class=\"n\">modelo</span><span class=\"w\"> </span><span class=\"n\">usando</span><span class=\"w\"> </span><span class=\"n\">variables</span><span class=\"w\"> </span><span class=\"n\">de</span><span class=\"w\"> </span><span class=\"n\">holgura</span><span class=\"w\"> </span><span class=\"n\">y</span><span class=\"w\"> </span><span class=\"n\">penalizaciones</span><span class=\"w\"> </span><span class=\"n\">para</span><span class=\"w\"> </span><span class=\"n\">las</span><span class=\"w\"> </span><span class=\"n\">restricciones</span><span class=\"o\">.</span>\n\n<span class=\"o\">-</span><span class=\"w\"> </span><span class=\"n\">Es</span><span class=\"w\"> </span><span class=\"n\">posible</span><span class=\"w\"> </span><span class=\"n\">especificar</span><span class=\"w\"> </span><span class=\"n\">el</span><span class=\"w\"> </span><span class=\"n\">peso</span><span class=\"w\"> </span><span class=\"n\">de</span><span class=\"w\"> </span><span class=\"n\">las</span><span class=\"w\"> </span><span class=\"n\">penalizaciones</span><span class=\"o\">.</span>\n</code></pre></div></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "OfTS",
+      "code_hash": "9c896226c86b010195e24cbdf7fbe603",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "lQxp",
+      "code_hash": "f8ecdb52c694f4753042f512886e9010",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Resolvemos el problema BQM usando el annealing simulado</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Plbk",
+      "code_hash": "6fe10d055ee00fa0d24f1ac7b3684ba4",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "rSYo",
+      "code_hash": "97f9fc427b04869319fa540007e0d517",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Para obtener las soluciones del problema CQM original:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "HuZB",
+      "code_hash": "f77f37747f070a17b474759427ab985e",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "WfYj",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Ynfw",
+      "code_hash": "33b3e69a90d97fa2ab1b5a6b69153914",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"e7\"></a></span>\n<h1 id=\"ejercicio-entregable-7-reparto-de-turnos-de-trabajo\"><strong>\u270d\ufe0f Ejercicio entregable 7: reparto de turnos de trabajo</strong></h1>\n<span class=\"paragraph\">En nuestra empresa se trabaja en cuatro turnos horarios, numerados del 0 al 3. Mediante una encuesta, se ha solocitado a los empleados que valoren de 1 a 4 su preferencia de turno (1 indica la m\u00e1s preferida y 4 la menos preferida). Los resultados son los de la tabla:</span>\n<table>\n<thead>\n<tr>\n<th>Empleado</th>\n<th>Turno 0</th>\n<th>Turno 1</th>\n<th>Turno 2</th>\n<th>Turno 3</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Ana</td>\n<td>1</td>\n<td>2</td>\n<td>3</td>\n<td>4</td>\n</tr>\n<tr>\n<td>Benito</td>\n<td>3</td>\n<td>2</td>\n<td>1</td>\n<td>4</td>\n</tr>\n<tr>\n<td>Carlos</td>\n<td>4</td>\n<td>2</td>\n<td>3</td>\n<td>1</td>\n</tr>\n<tr>\n<td>Diana</td>\n<td>4</td>\n<td>1</td>\n<td>2</td>\n<td>3</td>\n</tr>\n<tr>\n<td>Enrique</td>\n<td>1</td>\n<td>2</td>\n<td>3</td>\n<td>4</td>\n</tr>\n<tr>\n<td>Fabio</td>\n<td>3</td>\n<td>2</td>\n<td>1</td>\n<td>4</td>\n</tr>\n<tr>\n<td>Gala</td>\n<td>4</td>\n<td>2</td>\n<td>3</td>\n<td>1</td>\n</tr>\n<tr>\n<td>Hugo</td>\n<td>4</td>\n<td>1</td>\n<td>2</td>\n<td>3</td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\">Queremos expresar el problema como un CQM y resolverlo por fuerza bruta usando el ExactCQMSolver (usar\u00edamos el LeapHybridCQMSampler si tuvi\u00e9semos acceso a Leap).</span>\n<span class=\"paragraph\">El modelo que vamos a definir considera un conjunto de variables binarias <marimo-tex class=\"arithmatex\">||(x_{et}||)</marimo-tex> con <marimo-tex class=\"arithmatex\">||(e \\in {\\text{empleados}}||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(t \\in \\{0,1,2,3\\}||)</marimo-tex> representa el turno. Si <marimo-tex class=\"arithmatex\">||(x_{et} = 1||)</marimo-tex> el empleado <marimo-tex class=\"arithmatex\">||(e||)</marimo-tex> se asigna al turno <marimo-tex class=\"arithmatex\">||(t||)</marimo-tex>. Notar que varios empleados pueden asignarse al mismo turno, pero cada empleado solo puede estar en un turno, es decir:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\sum_{t=0}^3 x_{et} = 1, \u2200 e\n||]</marimo-tex><span class=\"paragraph\">La funci\u00f3n a minimizar ser\u00e1 la siguiente:</span>\n<marimo-tex class=\"arithmatex\">||[\n\\sum_{e \\in {\\text{empleados}}}\\sum_{t=0}^3 \\text{preferencia}_{et}x_{et}\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "LqFA",
+      "code_hash": "430106bd38334d9c3826cd0ed670c549",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Apartado 1</strong></span>\n<span class=\"paragraph\">En este primer caso, la \u00fanica restricci\u00f3n es que cada empleado solo puede estar asignado a un turno.</span>\n<span class=\"paragraph\">Mira la funci\u00f3n <code>build_cqm()</code> para a\u00f1adir esa restricci\u00f3n para cada empleado.</span>\n<span class=\"paragraph\">Sugerencia: mira la funci\u00f3n <a href=\"https://docs.dwavequantum.com/en/latest/ocean/api_ref_dimod/generated/dimod.ConstrainedQuadraticModel.add_discrete.html#dimod-constrainedquadraticmodel-add-discrete\" rel=\"noopener noreferrer\" target=\"_blank\"><code>cqm.add_discrete</code></a>, que permite indicar que para un empleado <marimo-tex class=\"arithmatex\">||(e||)</marimo-tex> solo haya un 1 en <marimo-tex class=\"arithmatex\">||(x_{et}, \\forall t\\in\\{0,1,2,3\\}||)</marimo-tex></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "uDnK",
+      "code_hash": "7ba56796748a9d2bda25c87f48f9dc1d",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "aWBL",
+      "code_hash": "981e01f105cf2c8d6f8fc433007e195e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Apartado 2</strong></span>\n<span class=\"paragraph\">Ahora queremos a\u00f1adir las siguientes restricciones</span>\n<ol>\n<li>Benito y Fabio no pueden trabajar durante el mismo turno</li>\n<li>A Enrique y Hugo les gustar\u00eda trabajar en el mismo turno</li>\n</ol>\n<span class=\"paragraph\">Modifica la funci\u00f3n <code>build_cqm()</code> para incorporar esas restricciones</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MIsd",
+      "code_hash": "745e015125abaf1d6c51a5f9f5b82437",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "IrqS",
+      "code_hash": "b0d970fed3fbf891deff59a3ad9717d8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Apartado 3</strong></span>\n<span class=\"paragraph\">Modifica el c\u00f3digo anterior para a\u00f1adir dos nuevas restricciones:</span>\n<ol>\n<li>Ana no puede trabajar en el turno 0</li>\n<li>Tiene que haber un m\u00e1ximo de dos empleados por turno</li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Lpqv",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "upgv",
+      "code_hash": "e8189a336481698b8fcf475120b64c82",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"variacionales\"></a></span>\n<h1 id=\"algoritmos-variacionales-y-circuitos-parametrizados\"><strong>Algoritmos variacionales y circuitos parametrizados</strong></h1></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "WJUG",
+      "code_hash": "fb89e6198d9e6bac367a9727f5339e92",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"algoritmos-cuanticos-variacionales\"><strong>Algoritmos cu\u00e1nticos variacionales</strong></h2>\n<span class=\"paragraph\">Problema de los computadores cu\u00e1nticos actuales: el ru\u00eddo destruye la superposici\u00f3n de estado.</span>\n<span class=\"paragraph\">No es posible resolver un problema complejo (profundo) en un sistema actual: por ejemplo, la factorizaci\u00f3n de Shor podr\u00eda necesitar millones de c\u00fabits para correcci\u00f3n de errores.</span>\n<span class=\"paragraph\">Computadores actuales: <em>Noisy intermediate-scale quantum</em> (NISQ)</span>\n<span class=\"paragraph\">Podemos pensar en dividir un problema complejo en partes m\u00e1s simples, y utilizar CPUs tradicionales en el proceso de optimizaci\u00f3n:</span>\n<center><img src=\"https://drive.google.com/uc?export=view&id=1WgpYw-cCkpuNZE2AOnPL4b3kIt9A_kU2\" alt=\"Algoritmo h\u00edbrido\" width=\"700\"  /></center>\n\n<span class=\"paragraph\">Esta estrategia tambi\u00e9n se denomina <em>Computaci\u00f3n h\u00edbrida</em>.</span>\n<span class=\"paragraph\">Se basa en usar un circuito cu\u00e1ntico que incluye par\u00e1metros que se van optimizando. Este circuitos se  denomina <em>ansatz</em>, <em>forma (o circuito) variacional</em> o, simplemente, circuito cu\u00e1ntico parametrizado.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pCao",
+      "code_hash": "f14c77fd5100f95f3f8cced8a20a9717",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"parametros\"></a></span>\n<h2 id=\"circuitos-parametrizados-en-qiskit\"><strong>Circuitos parametrizados en Qiskit</strong></h2>\n<span class=\"paragraph\">Qiskit incluye m\u00e9todos para facilitar la creaci\u00f3n de circuitos parametrizados.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wEIy",
+      "code_hash": "142c616cb43bf889b1535611d004d773",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "wlyU",
+      "code_hash": "9132f07fc154da8ab1f4e22f49d7f492",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Es posible definir vectores de par\u00e1metros</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PieA",
+      "code_hash": "320f6ff48bbbae545d2d374476a60be3",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "GrQN",
+      "code_hash": "34c345e608e07209dff3050bbc15cf2b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Finalmente, se dan valores a los par\u00e1metros.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Ilkb",
+      "code_hash": "5629a401d2d96339727e53ddaf1d4e5c",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "mySd",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vGkK",
+      "code_hash": "ded7c695794bab00a21d5cc67929295b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"qaoa\"></a></span>\n<h1 id=\"algoritmo-cuantico-de-optimizacion-aproximada-qaoa\"><strong>Algoritmo cu\u00e1ntico de optimizaci\u00f3n aproximada (QAOA)</strong></h1>\n<span class=\"paragraph\">El Quantum Approximate Optimization Algorithm o QAOA (Farhi, E., Goldstone, J., \\&amp; Gutmann, S. 2014) es un algoritmo h\u00edbrido basado en la discretizaci\u00f3n de la evoluci\u00f3n adiab\u00e1tica para resolver problemas Ising.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "zmIa",
+      "code_hash": "efdce960263f55a69c28973951878e2e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"discretizacion-de-la-evolucion-adiabatica-trotterization\"><strong>Discretizaci\u00f3n de la evoluci\u00f3n adiab\u00e1tica (<em>Trotterization</em>)</strong></h2>\n<span class=\"paragraph\">Podemos replicar la evoluci\u00f3n adiab\u00e1tica en un computador cu\u00e1ntico basado en puertas discretizando la evoluci\u00f3n continua del Hamiltoniano.</span>\n<span class=\"paragraph\">La evoluci\u00f3n temporal de un sistema viene dada por la ecuaci\u00f3n de Schr\u00f6dinger:</span>\n<marimo-tex class=\"arithmatex\">||[i\\hbar \\frac{d}{dt}|\\psi(t)\\rangle = H(t)|\\psi(t)\\rangle||]</marimo-tex><span class=\"paragraph\">En general, <marimo-tex class=\"arithmatex\">||(H(t)||)</marimo-tex> depende del tiempo. Pero en un intervalo temporal <marimo-tex class=\"arithmatex\">||([t_i, t_i+\\Delta t]||)</marimo-tex> suficientemente peque\u00f1o podemos considerar <marimo-tex class=\"arithmatex\">||(H(t_i)||)</marimo-tex> constante, verific\u00e1ndose que:</span>\n<marimo-tex class=\"arithmatex\">||[|\\psi(t_i+\\Delta t)\\rangle = e^{-iH(t_i)\\Delta t}|\\psi(t_i)\\rangle = U_i|\\psi(t_i)\\rangle||]</marimo-tex><span class=\"paragraph\">siendo <marimo-tex class=\"arithmatex\">||(U_i = e^{-iH(t_i)\\Delta t}||)</marimo-tex> una matriz unitaria.</span>\n<span class=\"paragraph\">Si discretizamos la evoluci\u00f3n en <marimo-tex class=\"arithmatex\">||(p = \\frac{T}{\\Delta t}||)</marimo-tex> pasos, podemos escribir:</span>\n<marimo-tex class=\"arithmatex\">||[\n|\\psi(t_1)\\rangle = U_0|\\psi(t_0)\\rangle \\\\\n|\\psi(t_2)\\rangle = U_1|\\psi(t_1)\\rangle \\\\\n\\cdots \\\\\n|\\psi(t_{p})\\rangle = U_{p-1}|\\psi(t_{p-1})\\rangle\n||]</marimo-tex><span class=\"paragraph\">De esta forma, el estado final del sistema ser\u00e1:</span>\n<marimo-tex class=\"arithmatex\">||[\n|\\psi(t_{p})\\rangle = U_{p-1}U_{p-2}\\cdots U_{1}U_{0}|\\psi(t_0)\\rangle = \\left(\\prod_{m=p-1}^{0} U_m\\right) |\\psi(t_0)\\rangle\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NOfw",
+      "code_hash": "11fdc33063f4a2c3220adca7827c6491",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">El Hamiltoniano usado en computaci\u00f3n adiab\u00e1tica es:</span>\n<marimo-tex class=\"arithmatex\">||[H(t) = A(t)H_0 + B(t)H_c||]</marimo-tex><span class=\"paragraph\">por lo que resulta:</span>\n<marimo-tex class=\"arithmatex\">||[\n|\\psi(T)\\rangle = \\left(\\prod_{m=0}^{p-1} e^{i\\Delta t(A'(t_m)H_0 + B'(t_m)H_c)}\\right) |\\psi(0)\\rangle\n||]</marimo-tex><span class=\"paragraph\">donde <marimo-tex class=\"arithmatex\">||(A'(t_m) = -A(t_{p-1-m})||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(B'(t_m) = -B(t_{p-1-m})||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(|\\psi(T)\\rangle = |\\psi(t_{p})\\rangle||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(|\\psi(0)\\rangle = |\\psi(t_{0})\\rangle||)</marimo-tex></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "jXAc",
+      "code_hash": "68e77101700a37945737f1a36684d2bf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">En general, dadas dos matrices <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(B||)</marimo-tex>, la igualdad <marimo-tex class=\"arithmatex\">||(e^{A+B} = e^Ae^B||)</marimo-tex> solo se da si <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(B||)</marimo-tex> <em>conmutan</em>, es decir si <marimo-tex class=\"arithmatex\">||([A,B] = AB-BA = 0||)</marimo-tex>.</span>\n<span class=\"paragraph\">Si <marimo-tex class=\"arithmatex\">||(\\Delta t||)</marimo-tex> es lo suficientemente peque\u00f1o y los hamiltonianos \"casi\" conmutan, la formula de Lie-Trotter de primer orden permite escribir:</span>\n<marimo-tex class=\"arithmatex\">||[\ne^{i\\Delta t(A'(t_m)H_0 + B'(t_m)H_c)}\n= e^{i\\Delta tA'(t_m)H_0} e^{i\\Delta tB'(t_m)H_c} +\n\\mathcal{O}(t^2) \\approx e^{i\\Delta tA'(t_m)H_0} e^{i\\Delta tB'(t_m)H_c}\n||]</marimo-tex><span class=\"paragraph\">Esta aproximaci\u00f3n se denomina <em>trotterization</em> y es la base de algoritmos como el QAOA.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "mSxP",
+      "code_hash": "dbca06410df4d9a8c0463f69ed14bf04",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Usando <em>trotterization</em>, el estado final del sistema se puede escribir:</span>\n<marimo-tex class=\"arithmatex\">||[\n|\\psi_f\\rangle = |\\psi(T)\\rangle = \\left(\\prod_{m=0}^{p-1} e^{i\\Delta tA'(t_m)H_0} e^{i\\Delta tB'(t_m)H_c}\\right) |\\psi(0)\\rangle =\n\\prod_{m=0}^{p-1} U_0(t_m)U_c(t_m)|\\psi_0\\rangle\n||]</marimo-tex><span class=\"paragraph\">siendo las matrices unitarias:</span>\n<marimo-tex class=\"arithmatex\">||[\nU_0(t_m) = e^{i\\Delta tA'(t_m)H_0} = e^{i\\beta_mH_0} = U_0(\\beta_m)\\\\\nU_c(t_m) = e^{i\\Delta tB'(t_m)H_c} = e^{i\\gamma_mH_c} = U_c(\\gamma_m)\n||]</marimo-tex><span class=\"paragraph\">con <marimo-tex class=\"arithmatex\">||(m=0,\\ldots,p-1||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(p \\ge 1||)</marimo-tex>.</span>\n<span class=\"paragraph\">QAOA intenta elegir unos valores de <marimo-tex class=\"arithmatex\">||(\\beta_m||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(\\gamma_m||)</marimo-tex> que aproximen el estado <marimo-tex class=\"arithmatex\">||(|\\psi_f\\rangle||)</marimo-tex> al estado base del Hamiltoniano de coste <marimo-tex class=\"arithmatex\">||(H_c||)</marimo-tex>, es decir, que minimizen <marimo-tex class=\"arithmatex\">||(\\langle\\psi_f|H_c|\\psi_f\\rangle||)</marimo-tex>.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "IZEX",
+      "code_hash": "6dd1aabd52312550ff2ebb323b8e2e15",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">El algoritmo QAOA parte de un Hamiltoniano de coste <marimo-tex class=\"arithmatex\">||(H_c||)</marimo-tex> que define el problema y procede como sigue:</span>\n<ol>\n<li>Se elige un valor de <marimo-tex class=\"arithmatex\">||(p\\ge 1||)</marimo-tex> y dos listas de valores <marimo-tex class=\"arithmatex\">||(\\boldsymbol{\\beta} = (\\beta_0,\\ldots,\\beta_{p-1})||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(\\boldsymbol{\\gamma} = (\\gamma_0,\\ldots,\\gamma_{p-1})||)</marimo-tex></li>\n<li>Como <marimo-tex class=\"arithmatex\">||(H_0||)</marimo-tex> se suele usar el <em>mixing Hamiltonian</em> o <em>mixer</em> <marimo-tex class=\"arithmatex\">||(H_M||)</marimo-tex> y como estado inicial la superposici\u00f3n completa (aunque se pueden usar otros)\n  $<marimo-tex class=\"arithmatex\">||(H_M = -\\sum_{i=0}^{n-1} X_i\\quad\n  |\\psi_0\\rangle = |+\\rangle^{\\otimes n}||)</marimo-tex>$</li>\n<li>La QPU aplica las puertas <marimo-tex class=\"arithmatex\">||(U_0(\\beta_m)U_c(\\gamma_m)||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(m=0,\\ldots,p-1||)</marimo-tex>, y se obtiene un nuevo estado <marimo-tex class=\"arithmatex\">||(|\\psi_p\\rangle||)</marimo-tex></li>\n<li>En la CPU se usa un algoritmo de optimizaci\u00f3n para actualizar los par\u00e1metros <marimo-tex class=\"arithmatex\">||(\\boldsymbol{\\beta}||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(\\boldsymbol{\\gamma}||)</marimo-tex> intentando minimizar el valor esperado <marimo-tex class=\"arithmatex\">||(\\langle\\psi_p|H_c|\\psi_p\\rangle||)</marimo-tex></li>\n<li>Se vuelve al paso 2 hasta obtener los valores \u00f3ptimos <marimo-tex class=\"arithmatex\">||(\\boldsymbol{\\beta}^\\ast||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(\\boldsymbol{\\gamma}^\\ast||)</marimo-tex></li>\n<li>Usando esos valores, se obtiene el estado que minimiza la soluci\u00f3n</li>\n</ol>\n<span class=\"paragraph\">El proceso de optimizaci\u00f3n de los par\u00e1metros puede ser un simple gradiente descendente, en el que cada par\u00e1metro se actualiza en la direcci\u00f3n que conduzca al mayor descenso del valor esperado, u otros m\u00e9todo de optimizaci\u00f3n m\u00e1s sofisticados.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "UFLA",
+      "code_hash": "b72676fa0640af8abf9085011ee7750e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"construccion-de-u_0beta-y-u_cgamma-para-un-problema-ising\">Construcci\u00f3n de <marimo-tex class=\"arithmatex\">||(U_0(\\beta)||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(U_c(\\gamma)||)</marimo-tex> para un problema Ising</h2>\n<h4 id=\"puertas-para-u_0beta\">Puertas para <marimo-tex class=\"arithmatex\">||(U_0(\\beta)||)</marimo-tex></h4>\n<span class=\"paragraph\">Si tenemos <marimo-tex class=\"arithmatex\">||(n||)</marimo-tex> c\u00fabits, y dado que las matrices <marimo-tex class=\"arithmatex\">||(X||)</marimo-tex> conmutan tenemos:</span>\n<marimo-tex class=\"arithmatex\">||[U_0(\\beta) = e^{i\\beta H_0} = e^{-i\\beta\\sum_{i=0}^{n-1} X_i} = \\prod_{i=0}^{n-1}e^{-i\\beta X_i}||]</marimo-tex><span class=\"paragraph\">Y recordando que la puerta de rotaci\u00f3n <marimo-tex class=\"arithmatex\">||(R_x(\\theta) = e^{-i\\theta X/2}||)</marimo-tex>, se tiene:</span>\n<marimo-tex class=\"arithmatex\">||[U_0(\\beta) = \\prod_{i=0}^{n-1} R_x^{(i)}(2\\beta)||]</marimo-tex><span class=\"paragraph\">La puerta <marimo-tex class=\"arithmatex\">||(R_x^{(i)}||)</marimo-tex> indica que se aplica una <marimo-tex class=\"arithmatex\">||(R_x||)</marimo-tex> al c\u00fabit <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex> y la identidad al resto <marimo-tex class=\"arithmatex\">||(\\implies||)</marimo-tex> el producto equivale a aplicar una puerta <marimo-tex class=\"arithmatex\">||(R_x(2\\beta)||)</marimo-tex> a cada uno de los c\u00fabits.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RCUM",
+      "code_hash": "02d2d4cfe34152258bf9f57d5a48b00c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"puertas-para-u_cgamma\">Puertas para <marimo-tex class=\"arithmatex\">||(U_c(\\gamma)||)</marimo-tex></h4>\n<span class=\"paragraph\">El Hamiltoniano de coste de un problema Ising es:</span>\n<marimo-tex class=\"arithmatex\">||[H_c = -\\sum_{i,j = 0}^{n-1} J_{ij}Z_iZ_j -\\sum_{i = 0}^{n-1} h_i Z_i||]</marimo-tex><span class=\"paragraph\">siendo <marimo-tex class=\"arithmatex\">||(J_{ij}||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(h_i||)</marimo-tex> n\u00fameros reales.</span>\n<span class=\"paragraph\">Ya que las matricez <marimo-tex class=\"arithmatex\">||(Z||)</marimo-tex> conmutan, podemos escribir</span>\n<marimo-tex class=\"arithmatex\">||[\nU_c(\\gamma) = e^{i\\gamma H_c} = e^{-i\\gamma(\\sum_{i,j = 0}^{n-1} J_{ij}Z_iZ_j +\\sum_{i = 0}^{n-1} h_i Z_i)} =\n\\prod_{i,j = 0}^{n-1}e^{-i\\gamma J_{ij}Z_iZ_j}\\prod_{i=0}^{n-1}e^{-i\\gamma h_i Z_i}\n||]</marimo-tex><span class=\"paragraph\">El segundo t\u00e9rmino se puede implementar con puertas <marimo-tex class=\"arithmatex\">||(R_z(\\theta) = e^{-i\\theta Z/2}||)</marimo-tex>.</span>\n<span class=\"paragraph\">Para el primer t\u00e9rmino, <marimo-tex class=\"arithmatex\">||(Z_iZ_j||)</marimo-tex> representa aplicar una puerta <marimo-tex class=\"arithmatex\">||(Z||)</marimo-tex> a los c\u00fabits <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(j||)</marimo-tex> y la identidad al resto:</span>\n<marimo-tex class=\"arithmatex\">||[\nZ_iZ_j = I\\otimes\\ldots\\otimes Z\\otimes\\ldots\\otimes Z \\otimes\\ldots I = Z_i\\otimes Z_j\n||]</marimo-tex><span class=\"paragraph\">Y el t\u00e9rmino <marimo-tex class=\"arithmatex\">||(e^{-i\\gamma J_{ij}Z_i\\otimes Z_j}||)</marimo-tex> corresponde a una <a href=\"https://qiskit.org/documentation/stubs/qiskit.circuit.library.RZZGate.html#qiskit.circuit.library.RZZGate\" rel=\"noopener noreferrer\" target=\"_blank\">puerta Ising ZZ</a> entre los c\u00fabits <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(j||)</marimo-tex>:</span>\n<marimo-tex class=\"arithmatex\">||[\nR_{ZZ}(\\theta) = \\exp\\left(-i\\frac{\\theta}{2}(Z\\otimes Z)\\right) =\n\\exp{\\left(-i\\frac{\\theta}{2}\\begin{bmatrix}\n1 &amp; 0 &amp; 0 &amp; 0\\\\\n0 &amp; -1 &amp; 0 &amp; 0\\\\\n0 &amp; 0 &amp; -1 &amp; 0\\\\\n0 &amp; 0 &amp; 0 &amp; 1\\\\\n\\end{bmatrix} \\right)}=\n\\begin{bmatrix}\ne^{-i\\theta/2} &amp; 0 &amp; 0 &amp; 0\\\\\n0 &amp; e^{i\\theta/2} &amp; 0 &amp; 0\\\\\n0 &amp; 0 &amp; e^{i\\theta/2} &amp; 0\\\\\n0 &amp; 0 &amp; 0 &amp; e^{-i\\theta/2}\\\\\n\\end{bmatrix}\n||]</marimo-tex><span class=\"paragraph\">Con lo que queda:</span>\n<marimo-tex class=\"arithmatex\">||[\nU_c(\\gamma) = \\prod_{i,j = 0}^{n-1} R_{ZZ}^{(i,j)}(2\\gamma J_{ij})\\prod_{i=0}^{n-1}R_z^{(i)}(2\\gamma h_i)\n||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ynmH",
+      "code_hash": "d5f24ee654dfdc47fdd4e197e5d22f70",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NBGo",
+      "code_hash": "86f5d1073128ea9587a93df5a2fb55ef",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"ejemplo-circuito-qaoa-para-un-hamiltoniano-ising\"><strong>Ejemplo</strong>: Circuito QAOA para un Hamiltoniano Ising</h3>\n<span class=\"paragraph\">Obtener el circuito QAOA para un paso (<marimo-tex class=\"arithmatex\">||(p||)</marimo-tex>=1) del Hamiltoniano Ising:</span>\n<marimo-tex class=\"arithmatex\">||[\nH_c = 3Z_2Z_0 - Z_2Z_1 + 2Z_0\n||]</marimo-tex><span class=\"paragraph\">Necesitamos 3 c\u00fabits, y el estado que queremos conseguir ser\u00e1:</span>\n<marimo-tex class=\"arithmatex\">||[\nU_0(\\beta)U_c(\\gamma) |+\\rangle^{\\otimes 3}\n||]</marimo-tex><span class=\"paragraph\">Con</span>\n<marimo-tex class=\"arithmatex\">||[\nU_0(\\beta) = \\prod_{i=0}^{2} R_x^{(i)}(2\\beta) = R_x^{(0)}(2\\beta)\\otimes R_x^{(1)}(2\\beta)\\otimes R_x^{(2)}(2\\beta)\n||]</marimo-tex><marimo-tex class=\"arithmatex\">||[\nU_c(\\gamma) = \\prod_{i,j = 0}^{2} R_{ZZ}^{(i,j)}(2\\gamma J_{ij})\\prod_{i=0}^{2}R_z^{(i)}(2\\gamma h_i) = (R_{ZZ}^{(2,0)}(6\\gamma)\\otimes R_{ZZ}^{(2,1)}(-2\\gamma))(R_z^{(0)}(4\\gamma))\n||]</marimo-tex><span class=\"paragraph\">El circuito ser\u00eda:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "eooq",
+      "code_hash": "0b7dfdad8607a31b3fff32891523b2fc",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ChmK",
+      "code_hash": "ad02e33de281dc129897e1b283c8d329",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Podemos usar la implementaci\u00f3n de QAOA de Qiskit para obtener este mismo circuito</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "KdvC",
+      "code_hash": "8b2e3ecb3b5d012b9ca1bb4bdb2250ee",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "vkvV",
+      "code_hash": "d6574658c22d678c95f3c94c5b92df01",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Para resolverlo, podemos usar la implementaci\u00f3n de <a href=\"https://qiskit-community.github.io/qiskit-algorithms/stubs/qiskit_algorithms.QAOA.html\" rel=\"noopener noreferrer\" target=\"_blank\">QAOA</a> del paquete <a href=\"https://qiskit-community.github.io/qiskit-algorithms/apidocs/qiskit_algorithms.html\" rel=\"noopener noreferrer\" target=\"_blank\">qiskit_algorithms</a>.</span>\n<ul>\n<li>Tenemos que especificar el algoritmo cl\u00e1sico de optimizaci\u00f3n que vamos a usar</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "EKSN",
+      "code_hash": "b35c98a72268a9ea41233ad8cfcba1aa",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "tasN",
+      "code_hash": "563fa0de0c74ebb45047a8a92151cf8e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">El circuito que utiliz\u00f3:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SXvM",
+      "code_hash": "41206429f38106bd02039bb748fc801f",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "CFll",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wbrJ",
+      "code_hash": "c80611a8bcd628b55ca607e9e9fcc21e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"e8\"></a></span>\n<h1 id=\"ejercicio-entregable-8-suma-de-subconjuntos-con-qaoa\"><strong>\u270d\ufe0f Ejercicio entregable 8: suma de subconjuntos con QAOA</strong></h1>\n<span class=\"paragraph\">En el ejercicio 6, hab\u00edamos expresado como Ising el problema de la suma de subconjuntos para <marimo-tex class=\"arithmatex\">||(S=\\{-3, 2, -2, 5, 1\\}||)</marimo-tex> y <marimo-tex class=\"arithmatex\">||(T=-4||)</marimo-tex>. Resu\u00e9lvelo usando la implementaci\u00f3n de QAOA de qiskit_algorithms</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "viyg",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "GbuD",
+      "code_hash": "c90cfc2dab5cf6b98f012cd8e5868230",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"variantes-de-qaoa\"><strong>Variantes de QAOA</strong></h2>\n<ul>\n<li>\n<span class=\"paragraph\">Quantum Alternating Operator Ansatz:</span>\n<ul>\n<li>Extiende el QAOA original para permitir el uso de otros tipos de operadores como hamiltonianos de coste y <em>mixer</em> que capturen mejor la estructura de problemas espec\u00edficos</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">XY Mixers:</span>\n<ul>\n<li>Estrategias para aplicar restricciones estrictas utilizando hamiltonianos XY como <em>mixers</em></li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">ADAPT-QAOA:</span>\n<ul>\n<li>Reemplaza el <em>mixing Hamiltonian</em> por un conjunto de <em>mixers</em> que cambian de una capa a la siguiente</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\">Warm start QAOA:</span>\n<ul>\n<li>Inicializa el estado cu\u00e1ntico con una soluci\u00f3n cl\u00e1sica aproximada</li>\n</ul>\n</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bHhy",
+      "code_hash": "f7de7576ad323b527e6ce3e7266c3599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<hr />\n<hr /></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ctlq",
+      "code_hash": "9b691382a3f4685993af4b66760583db",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><a name=\"otros\"></a></span>\n<h1 id=\"otros-algoritmos-cuanticos-de-optimizacion\"><strong>Otros algoritmos cu\u00e1nticos de optimizaci\u00f3n</strong></h1>\n<span class=\"paragraph\">Existen otras propuestas de algoritmos cu\u00e1nticos de optimizaci\u00f3n:</span>\n<ul>\n<li>\n<span class=\"paragraph\"><a href=\"https://arxiv.org/abs/1304.3061\" rel=\"noopener noreferrer\" target=\"_blank\">Variational Quantum Eigensolver</a> (VQE)</span>\n<ul>\n<li>Generalizaci\u00f3n del QAOA, tambi\u00e9n busca minimizar un Hamiltoniano</li>\n<li>Dise\u00f1ado para aplicaciones de qu\u00edmica computacional, se puede usar en algoritmos QUBO</li>\n<li>Usa diferentes ans\u00e4tze dependiendo del hardware disponible o del problema a tratar</li>\n</ul>\n</li>\n<li>\n<span class=\"paragraph\"><a href=\"https://arxiv.org/abs/quant-ph/9607014\" rel=\"noopener noreferrer\" target=\"_blank\">Grover Adaptive Search</a> (GAS)</span>\n<ul>\n<li>\n<span class=\"paragraph\">Busca encontrar el m\u00ednimo de una funci\u00f3n <marimo-tex class=\"arithmatex\">||(g(x)||)</marimo-tex> usando el algoritmo de b\u00fasqueda de Grover:</span>\n<ol>\n<li>Se elige un valor <marimo-tex class=\"arithmatex\">||(x_0||)</marimo-tex> aleatorio y se computa <marimo-tex class=\"arithmatex\">||(g(x_0)||)</marimo-tex></li>\n<li>Se define un or\u00e1culo <marimo-tex class=\"arithmatex\">||(f:\\{0,1\\}^n \\rightarrow \\{0,1\\}||)</marimo-tex> de la forma:</li>\n</ol>\n</li>\n</ul>\n</li>\n</ul>\n<marimo-tex class=\"arithmatex\">||[\nf(y) =\n\\begin{cases}\n1, \\text{si } g(y) &lt; g(x_0)\\\\\n0, \\text{si } \\text{ en otro caso}\n\\end{cases}\n||]</marimo-tex><div class=\"language-scdoc highlight\"><pre><span></span><code>    1. Se usa el algoritmo de Grover para encontrar un $y$ ($\\mathcal{O}\\left(\\sqrt{2^n}\\right)$ evaluaciones).\n\n    1. Se hace $x_0=y$ y se vuelve al punto 2 hasta encontrar el m\u00ednimo.\n\n<span class=\"k\">-</span> Problemas:\n\n    <span class=\"k\">-</span> Dise\u00f1ar el or\u00e1culo puede ser complejo\n\n    <span class=\"k\">-</span> Es sensible al ruido\n</code></pre></div>\n<ul>\n<li>\n<span class=\"paragraph\"><a href=\"https://www.nature.com/articles/s41467-024-55346-z\" rel=\"noopener noreferrer\" target=\"_blank\">Pauli Correlation Encoding</a> (PCE)</span>\n<ul>\n<li>Similar a QAOA o VQE, reduce el n\u00famero de c\u00fabits necesarios mapeando las variables cl\u00e1sicas en correlaciones <em>multi-body</em> de matrices de Pauli.</li>\n</ul>\n</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NtNR",
+      "code_hash": "b76969d30f114847ca5f780e1a394cff",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"referencia\"><strong>Referencia</strong></h3>\n<span class=\"paragraph\"><strong>Problemas QUBO e Ising</strong></span>\n<div class=\"language-text highlight\"><pre><span></span><code>- Lucas, Andrew. &quot;Ising formulations of many NP problems.&quot; Frontiers in physics 2 (2014): 5\n</code></pre></div>\n<span class=\"paragraph\"><strong>Computaci\u00f3n adiab\u00e1tica y annealers</strong></span>\n<ul>\n<li>Farhi, E., Goldstone, J., Gutmann, S., &amp; Sipser, M. (2000). Quantum computation by adiabatic evolution. <a href=\"https://arxiv.org/pdf/quant-ph/0001106\" rel=\"noopener noreferrer\" target=\"_blank\">arXiv preprint quant-ph/0001106</a></li>\n<li>Aharonov, D. et al. (2008). Adiabatic quantum computation is equivalent to standard quantum computation. SIAM review, 50(4), 755-787. <a href=\"https://doi.org/10.1137/080734479\" rel=\"noopener noreferrer\" target=\"_blank\">https://doi.org/10.1137/080734479</a></li>\n<li>DWave <a href=\"https://www.dwavequantum.com/\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.dwavequantum.com/</a></li>\n</ul>\n<span class=\"paragraph\"><strong>QAOA</strong></span>\n<ul>\n<li>Farhi, E., Goldstone, J., &amp; Gutmann, S. (2014). A quantum approximate optimization algorithm. arXiv preprint <a href=\"https://arxiv.org/abs/1411.4028\" rel=\"noopener noreferrer\" target=\"_blank\">arXiv:1411.4028</a></li>\n<li>Zhu, Linghua, et al. \"Adaptive quantum approximate optimization algorithm for solving combinatorial problems on a quantum computer.\" Physical Review Research 4.3 (2022): 033029. <a href=\"https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.4.033029\" rel=\"noopener noreferrer\" target=\"_blank\">https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.4.033029</a></li>\n<li>Hadfield, Stuart, et al. \"From the quantum approximate optimization algorithm to a quantum alternating operator ansatz.\" Algorithms 12.2 (2019): 34. <a href=\"https://www.mdpi.com/1999-4893/12/2/34\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.mdpi.com/1999-4893/12/2/34</a></li>\n<li>Yu, Yunlong, et al. \"Warm-start adaptive-bias quantum approximate optimization algorithm.\" Physical Review A 112.1 (2025): 012422. <a href=\"https://journals.aps.org/pra/abstract/10.1103/nt3w-j4mj\" rel=\"noopener noreferrer\" target=\"_blank\">https://journals.aps.org/pra/abstract/10.1103/nt3w-j4mj</a></li>\n<li>Tutorial de Qiskit: <a href=\"https://learning.quantum.ibm.com/tutorial/quantum-approximate-optimization-algorithm\" rel=\"noopener noreferrer\" target=\"_blank\">https://learning.quantum.ibm.com/tutorial/quantum-approximate-optimization-algorithm</a></li>\n</ul>\n<span class=\"paragraph\"><strong>Otros</strong></span>\n<ul>\n<li>Peruzzo et al. (2014). A variational eigenvalue solver on a photonic quantum processor. Nature communications, 5(1), 1-7. <a href=\"https://arxiv.org/abs/1304.3061\" rel=\"noopener noreferrer\" target=\"_blank\">arXiv:1304.3061</a></li>\n<li>Durr, C., &amp; Hoyer, P. (1996). A quantum algorithm for finding the minimum. <a href=\"https://arxiv.org/abs/quant-ph/9607014\" rel=\"noopener noreferrer\" target=\"_blank\">arXiv preprint quant-ph/9607014</a></li>\n<li>Sciorilli et al. (2025). Towards large-scale quantum optimization solvers with few qubits. Nature Communications, 16(1), 476. <a href=\"https://www.nature.com/articles/s41467-024-55346-z\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.nature.com/articles/s41467-024-55346-z</a></li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
